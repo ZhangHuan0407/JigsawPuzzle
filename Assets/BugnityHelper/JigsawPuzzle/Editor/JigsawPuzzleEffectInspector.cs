@@ -71,7 +71,7 @@ namespace BugnityHelper.JigsawPuzzle
             // 我懒得拦截 null 了，反正拦截完也要 LogError，直接报错也一样
             SpriteCopy effectCopy = new SpriteCopy(m_target.Sprite);
             IEnumerable<SpriteCopy> imageTexture2DCopy = from image in m_target.AllImages
-                                     where image.sprite != null
+                                     where image != null && image.sprite != null
                                      select new SpriteCopy(image.sprite);
 
             JPArguments = new JigsawPuzzleArguments(
@@ -79,8 +79,10 @@ namespace BugnityHelper.JigsawPuzzle
                 effectCopy,
                 imageTexture2DCopy.ToArray());
 
+            JigsawPuzzleArguments.LoadTextureCopy(JPArguments);
             JPArguments.Add((JigsawPuzzleArguments argument) => 
             {
+                argument.Stopwatch.Start();
                 argument.Effect.CreateMinimap();
             }, true);
             int imageCount = JPArguments.AllImages.Length;
@@ -93,7 +95,7 @@ namespace BugnityHelper.JigsawPuzzle
             for (int index = 0; index < imageCount; index++)
             {
                 SpriteCopy texture2DCopy = JPArguments.AllImages[index];
-                JPArguments.Add(texture2DCopy.TryGetPreferredLocalPosition, true);
+                JPArguments.Add(texture2DCopy.TryGetPreferredPosition, true);
             }
 
             JPArguments

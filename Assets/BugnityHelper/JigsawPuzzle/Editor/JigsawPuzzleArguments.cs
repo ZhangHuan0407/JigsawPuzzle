@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Text;
 using UnityEngine;
 
 namespace BugnityHelper.JigsawPuzzle
@@ -23,6 +25,8 @@ namespace BugnityHelper.JigsawPuzzle
 
         internal readonly string TempFileName;
 
+        internal readonly Stopwatch Stopwatch;
+
         /* inter */
         internal int LeftTaskCount => TaskQueue.Count;
 
@@ -37,6 +41,8 @@ namespace BugnityHelper.JigsawPuzzle
             TaskQueue = new Queue<Action<JigsawPuzzleArguments>>();
 
             TempFileName = tempFileName ?? throw new ArgumentNullException(nameof(tempFileName));
+
+            Stopwatch = new Stopwatch();
         }
 
         /* func */
@@ -51,11 +57,11 @@ namespace BugnityHelper.JigsawPuzzle
                 }
             return this;
         }
-        public void LoadTextureCopy()
+        public static void LoadTextureCopy(JigsawPuzzleArguments arguments)
         {
-            Effect.LoadPixel(this);
-            foreach (SpriteCopy spriteCopy in AllImages)
-                spriteCopy.LoadPixel(this);
+            arguments.Effect.LoadPixel(arguments);
+            foreach (SpriteCopy spriteCopy in arguments.AllImages)
+                spriteCopy.LoadPixel(arguments);
         }
         internal Texture2D GetTexture2DCopy(Sprite sprite)
         {
@@ -79,12 +85,15 @@ namespace BugnityHelper.JigsawPuzzle
             Directory.CreateDirectory(DirectoryPath);
             string content = arguments.ToString();
             File.WriteAllText($"{DirectoryPath}/{arguments.TempFileName}", content);
+            UnityEngine.Debug.Log($"{arguments.TempFileName} have write out.\nIn {arguments.Stopwatch.ElapsedMilliseconds / 1000f:0.00}(s)");
+            arguments.Stopwatch.Stop();
         }
 
         public void Execute()
         {
             try
             {
+                UnityEngine.Debug.Log($"{TempFileName} start to exucute.");
                 Action<JigsawPuzzleArguments> topTask;
                 while (true)
                 {
@@ -100,14 +109,24 @@ namespace BugnityHelper.JigsawPuzzle
             }
             catch (Exception e)
             {
-                Debug.LogError($"Throw Exception in {nameof(JigsawPuzzleArguments)}.{nameof(Execute)} method.\n {e.Message}\n{e.StackTrace}");
+                UnityEngine.Debug.LogError($"Throw Exception in {nameof(JigsawPuzzleArguments)}.{nameof(Execute)} method.\n {e.Message}\n{e.StackTrace}");
+            }
+            finally
+            {
+                Stopwatch.Stop();
             }
         }
 
         /* operator */
         public override string ToString()
         {
-            return base.ToString();
+            StringBuilder builder = new StringBuilder();
+            foreach (SpriteCopy spriteCopy in AllImages)
+            {
+                builder.AppendLine($"{spriteCopy.ImageIdentified}")
+                    .AppendLine($"{spriteCopy.HavePreferredPositiosn}&{spriteCopy.PreferredPosition}");
+            }
+            return builder.ToString();
         }
     }
 }

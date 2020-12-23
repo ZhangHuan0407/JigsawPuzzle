@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
@@ -22,8 +23,8 @@ namespace BugnityHelper.JigsawPuzzle
         /// 1/4像素数据拷贝
         /// </summary>
         public Vector4[,] PixelsQuarter { get; protected set; }
-        public Vector2 PreferredLocalPosition { get; protected set; }
-        public bool GetPreferredPositiosn { get; protected set; }
+        public Vector2 PreferredPosition { get; protected set; }
+        public bool HavePreferredPositiosn { get; protected set; }
 
         /* inter */
 
@@ -39,7 +40,7 @@ namespace BugnityHelper.JigsawPuzzle
             ImageSize = new Vector2Int((int)rect.width, (int)rect.height);
             Pixels = new Vector4[ImageSize.x, ImageSize.y];
             ImageIdentified = $"{AssetDatabase.GetAssetPath(sprite)}/{sprite.name}";
-            GetPreferredPositiosn = false;
+            HavePreferredPositiosn = false;
         }
 
         /* func */
@@ -51,7 +52,8 @@ namespace BugnityHelper.JigsawPuzzle
                 {
                     int shiftX = TexturePosition.x;
                     int shiftY = TexturePosition.y;
-                    Pixels[x, y] = copyTexture.GetPixel(x + shiftX, y + shiftY);
+                    Color color = copyTexture.GetPixel(x + shiftX, y + shiftY);
+                    Pixels[x, y] = new Vector4(color.r, color.g, color.b, color.a);
                 }
         }
         public void CreateMinimap()
@@ -61,19 +63,22 @@ namespace BugnityHelper.JigsawPuzzle
             PixelsQuarter = new Vector4[width, height];
             for (int y = 0; y < height; y++)
                 for (int x = 0; x < width; x++)
-                {
                     PixelsQuarter[x, y] = Pixels[x * 4, y * 4];
-                }
         }
 
-        public void TryGetPreferredLocalPosition(JigsawPuzzleArguments arguments)
+        public void TryGetPreferredPosition(JigsawPuzzleArguments arguments)
         {
             Vector4[,] effectPixelsQuarter = arguments.Effect.PixelsQuarter;
-
-
-            Debug.LogWarning("Not Implemented Exception");
-
-
+            RGBASpriteMatch match = new RGBASpriteMatch(effectPixelsQuarter, PixelsQuarter);
+            _ = match.ExecuteAverageValue();
+            if (match.PreferredPosition is Vector2Int position)
+            {
+                PreferredPosition = position * 4;
+                HavePreferredPositiosn = true;
+            }
+            else
+                HavePreferredPositiosn = false;
+            Debug.Log($"{ImageIdentified}\n{nameof(TryGetPreferredPosition)} return => {HavePreferredPositiosn}.In {arguments.Stopwatch.ElapsedMilliseconds / 1000f:0.00}(s)\n");
         }
 
         /* operator */
