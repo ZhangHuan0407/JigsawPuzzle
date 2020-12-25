@@ -62,3 +62,10 @@ crashlytics-build.properties
 /[Aa]ssets/Resources
 /[Aa]ssets/Editor Default Resources/BugnityHelper/JigsawPuzzle/TaskAndData
 
+# Publish
+/Publish/MVCDebug
+
+# MVC
+JigsawPuzzleMVC/JigsawPuzzleMVC/bin
+JigsawPuzzleMVC/JigsawPuzzleMVC/obj
+JigsawPuzzleMVC/packages
