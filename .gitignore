@@ -58,3 +58,7 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+# Resource
+/[Aa]ssets/Resources
+/[Aa]ssets/Editor Default Resources/BugnityHelper/JigsawPuzzle/TaskAndData
+
