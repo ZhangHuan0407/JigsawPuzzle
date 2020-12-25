@@ -1,0 +1,24 @@
+{
+    "CreationTime": "12/25/2020 1:21:27 PM",
+    "LastWriteTime": "12/25/2020 1:21:27 PM",
+    "SpriteInfos": [
+        {
+            "IsEffect": true,
+            "SpriteFullPath": "CookingMasterSale_img_42/CookingMasterSale_img_42",
+            "Width": 135,
+            "Height": 33,
+            "TexturePosX": 0,
+            "TexturePosY": 0,
+            "ColorDataStartPosition": 0
+        },
+        {
+            "IsEffect": false,
+            "SpriteFullPath": "CookingMasterSale_img_41/CookingMasterSale_img_41",
+            "Width": 35,
+            "Height": 36,
+            "TexturePosX": 0,
+            "TexturePosY": 0,
+            "ColorDataStartPosition": 31185
+        }
+    ]
+}

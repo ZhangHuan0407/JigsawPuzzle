@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEngine;
 
@@ -27,6 +29,9 @@ namespace BugnityHelper.JigsawPuzzle
             if (GUILayout.Button("1"))
             {
                 JigsawPuzzleAsset.GetNew();
+            }
+            if (GUILayout.Button("2"))
+            {
             }
         }
     }

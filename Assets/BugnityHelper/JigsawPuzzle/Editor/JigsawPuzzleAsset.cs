@@ -1,10 +1,8 @@
-﻿using System.Linq;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.IO;
-using System;
 using UnityEditor;
-using System.Text;
+using UnityEngine;
 
 namespace BugnityHelper.JigsawPuzzle
 {
@@ -21,10 +19,8 @@ namespace BugnityHelper.JigsawPuzzle
         [Tooltip("数据文件名称(不要修改内容)")]
         public string DataName;
 
-        [Header("Data")]
-        public string MigrationTime;
-        [Tooltip("详细的精灵图片信息(不要修改内容)")]
-        public SpriteInfo[] SpriteInfos;
+        [Tooltip("Data")]
+        public JigsawPuzzleInfoData InfoData;
 
         /* inter */
         public string AssetFullName => $"{AssetDirectory}/{DataName}.asset";
@@ -36,11 +32,12 @@ namespace BugnityHelper.JigsawPuzzle
         {
             Sprites = new Sprite[0];
             DataName = Guid.NewGuid().ToString();
-            SpriteInfos = new SpriteInfo[0];
-            MigrationTime = string.Empty;
         }
 
         /* inter */
+        /// <summary>
+        /// 检查当前用户提供的数据是否完整
+        /// </summary>
         public bool Check => Effect && Sprites != null && Sprites.Length > 0;
 
         /* func */
@@ -64,35 +61,34 @@ namespace BugnityHelper.JigsawPuzzle
                 return;
             }
 
-            SpriteInfos = new SpriteInfo[Sprites.Length + 1];
-            SpriteInfos[0] = new SpriteInfo(Effect, true);
-            for (int index = 0; index < Sprites.Length; index++)
-                SpriteInfos[index + 1] = new SpriteInfo(Sprites[index], false);
-
-            using (SpriteColorBuilder spriteBuilder = new SpriteColorBuilder())
+            InfoData = new JigsawPuzzleInfoData()
             {
-                spriteBuilder.AppendSprite(Effect, SpriteInfos[0]);
-                for (int index = 1; index < SpriteInfos.Length; index++)
-                    spriteBuilder.AppendSprite(Sprites[index - 1], SpriteInfos[(int)index]);
-                File.WriteAllBytes(BinDataFullName, spriteBuilder.ToArray());
+                SpriteInfos = new SpriteInfo[Sprites.Length + 1],
+        };
+            SpriteInfo[] spriteInfos = InfoData.SpriteInfos;
+            spriteInfos[0] = new SpriteInfo(Effect, true);
+            for (int index = 0; index < Sprites.Length; index++)
+                spriteInfos[index + 1] = new SpriteInfo(Sprites[index], false);
+
+            using (SpriteColorBuilder spriteColorBuilder = new SpriteColorBuilder())
+            {
+                spriteColorBuilder.AppendSprite(Effect, spriteInfos[0]);
+                for (int index = 1; index < spriteInfos.Length; index++)
+                    spriteColorBuilder.AppendSprite(Sprites[index - 1], spriteInfos[index]);
+                File.WriteAllBytes(BinDataFullName, spriteColorBuilder.ToArray());
             }
 
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("{spriteInfo = [");
-            foreach (SpriteInfo spriteInfo in SpriteInfos)
-                stringBuilder.Append(EditorJsonUtility.ToJson(spriteInfo))
-                    .AppendLine(",");
-            stringBuilder.AppendLine("]}");
-            File.WriteAllText(InfoDataFullName, stringBuilder.ToString());
-            stringBuilder.Clear();
+            InfoData.UpdateTime();
 
-            MigrationTime = DateTime.Now.ToString();
-            throw new NotImplementedException();
+            string content = EditorJsonUtility.ToJson(InfoData, true);
+            File.WriteAllText(InfoDataFullName, content);
         }
         public void RemoveDataFiles() 
         {
             File.Delete(InfoDataFullName);
+            File.Delete($"{InfoDataFullName}.meta");
             File.Delete(BinDataFullName);
+            File.Delete($"{BinDataFullName}.meta");
         }
 
         public static IEnumerable<string> GetAssetList() => Directory.GetFiles(AssetDirectory, "*.asset");

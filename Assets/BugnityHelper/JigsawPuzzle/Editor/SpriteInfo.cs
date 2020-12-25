@@ -6,6 +6,8 @@ namespace BugnityHelper.JigsawPuzzle
     [Serializable]
     public class SpriteInfo
     {
+        /* const */
+
         /* field */
         public bool IsEffect;
         public string SpriteFullPath;
@@ -15,8 +17,11 @@ namespace BugnityHelper.JigsawPuzzle
         public int TexturePosX;
         public int TexturePosY;
 
-        public int BinDataStart;
-        public int BinDataEnd;
+        public long ColorDataStartPosition;
+
+        /* inter */
+        public long ColorDataLength => JPColor.FileDataPreJPColor * Width * Height;
+        public int PixelCount => Width * Height;
 
         /* ctor */
         public SpriteInfo(Sprite sprite, bool isEffect)

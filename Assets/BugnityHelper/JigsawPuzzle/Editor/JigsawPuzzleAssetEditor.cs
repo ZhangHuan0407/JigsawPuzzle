@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 namespace BugnityHelper.JigsawPuzzle
@@ -20,10 +18,16 @@ namespace BugnityHelper.JigsawPuzzle
                 m_Target.RemoveInvalidData();
             EditorGUILayout.Space();
             if (GUILayout.Button(nameof(JigsawPuzzleAsset.CreateDataFiles)))
+            {
                 m_Target.CreateDataFiles();
+                AssetDatabase.Refresh();
+            }
             EditorGUILayout.Space();
             if (GUILayout.Button(nameof(JigsawPuzzleAsset.RemoveDataFiles)))
+            {
                 m_Target.RemoveDataFiles();
+                AssetDatabase.Refresh();
+            }
         }
     }
 }
