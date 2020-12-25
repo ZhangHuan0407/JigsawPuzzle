@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEngine;
 
-namespace BugnityHelper.JigsawPuzzle
+namespace JigsawPuzzle
 {
     public class JigsawPuzzleWindow : EditorWindow
     {
@@ -13,7 +11,7 @@ namespace BugnityHelper.JigsawPuzzle
         
 
         /* ctor */
-        [MenuItem("BugnityHelper/JigsawPuzzle")]
+        [MenuItem("Custom Tool/Jigsaw Puzzle")]
         public static void OpenJigsawPuzzleWindow()
         {
             JigsawPuzzleWindow window = GetWindow<JigsawPuzzleWindow>(nameof(JigsawPuzzleWindow));

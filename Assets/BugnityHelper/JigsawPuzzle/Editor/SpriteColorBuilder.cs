@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
-namespace BugnityHelper.JigsawPuzzle
+namespace JigsawPuzzle
 {
     public class SpriteColorBuilder : IDisposable
     {

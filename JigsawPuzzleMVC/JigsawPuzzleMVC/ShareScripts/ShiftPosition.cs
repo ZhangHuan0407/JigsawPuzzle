@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace BugnityHelper.JigsawPuzzle
+namespace JigsawPuzzle
 {
     /// <summary>
     /// 枚举坐标倾向性 选择不同的倾向性以使用不同的枚举策略
     /// </summary>
+    [ShareScripts]
     [Flags]
-    public enum EnumPositionPropensity
+    public enum ShiftPositionPropensity
     {
         /// <summary>
         /// 逐行枚举偏移量
@@ -36,18 +36,19 @@ namespace BugnityHelper.JigsawPuzzle
         Random32 = 0x2000,
     }
 
+    [ShareScripts]
     public static class ShiftPosition
     {
         /* field */
-        private static Dictionary<EnumPositionPropensity, Func<Vector2Int, Vector2Int, IEnumerable<Vector2Int>>> EnumItMethods =
-            new Dictionary<EnumPositionPropensity, Func<Vector2Int, Vector2Int, IEnumerable<Vector2Int>>>()
+        private static Dictionary<ShiftPositionPropensity, Func<Point, Point, IEnumerable<Point>>> EnumItMethods =
+            new Dictionary<ShiftPositionPropensity, Func<Point, Point, IEnumerable<Point>>>()
             {
-                { EnumPositionPropensity.LineByLine,    LineByLine },
-                { EnumPositionPropensity.Tween,         Tween },
-                { EnumPositionPropensity.Interval4,     Interval4 },
-                { EnumPositionPropensity.Interval12,    Interval12 },
-                { EnumPositionPropensity.Random6,       Random6 },
-                { EnumPositionPropensity.Random32,      Random32 },
+                { ShiftPositionPropensity.LineByLine,    LineByLine },
+                { ShiftPositionPropensity.Tween,         Tween },
+                { ShiftPositionPropensity.Interval4,     Interval4 },
+                { ShiftPositionPropensity.Interval12,    Interval12 },
+                { ShiftPositionPropensity.Random6,       Random6 },
+                { ShiftPositionPropensity.Random32,      Random32 },
             };
 
         /* func */
@@ -58,12 +59,12 @@ namespace BugnityHelper.JigsawPuzzle
         /// <param name="backgroundSize">后景尺寸</param>
         /// <param name="propensity">枚举倾向性</param>
         /// <returns>偏移量</returns>
-        public static IEnumerable<Vector2Int> EnumIt(
-            Vector2Int fontgroundSize,
-            Vector2Int backgroundSize,
-            EnumPositionPropensity propensity)
+        public static IEnumerable<Point> EnumIt(
+            Point fontgroundSize,
+            Point backgroundSize,
+            ShiftPositionPropensity propensity)
         {
-            if (EnumItMethods.TryGetValue(propensity, out Func<Vector2Int, Vector2Int, IEnumerable<Vector2Int>> method))
+            if (EnumItMethods.TryGetValue(propensity, out Func<Point, Point, IEnumerable<Point>> method))
                 return method(fontgroundSize, backgroundSize);
             else
                 throw new NotImplementedException();
@@ -76,11 +77,11 @@ namespace BugnityHelper.JigsawPuzzle
         /// <param name="fontgroundSize">前景尺寸</param>
         /// <param name="backgroundSize">后景尺寸</param>
         /// <returns>偏移量</returns>
-        private static IEnumerable<Vector2Int> LineByLine(Vector2Int fontgroundSize, Vector2Int backgroundSize)
+        private static IEnumerable<Point> LineByLine(Point fontgroundSize, Point backgroundSize)
         {
-            for (int shiftY = 0; shiftY <= backgroundSize.y - fontgroundSize.y; shiftY++)
-                for (int shiftX = 0; shiftX <= backgroundSize.x - fontgroundSize.x; shiftX++)
-                    yield return new Vector2Int(shiftX, shiftY);
+            for (int shiftY = 0; shiftY <= backgroundSize.Y - fontgroundSize.Y; shiftY++)
+                for (int shiftX = 0; shiftX <= backgroundSize.X - fontgroundSize.X; shiftX++)
+                    yield return new Point(shiftX, shiftY);
         }
         /// <summary>
         /// 逐行枚举补间值
@@ -90,33 +91,33 @@ namespace BugnityHelper.JigsawPuzzle
         /// <param name="one">边界位置1</param>
         /// <param name="another">边界位置2</param>
         /// <returns>补间值</returns>
-        private static IEnumerable<Vector2Int> Tween(Vector2Int one, Vector2Int another)
+        private static IEnumerable<Point> Tween(Point one, Point another)
         {
             int startShiftY, endShiftY;
-            if (one.y > another.y)
+            if (one.Y > another.Y)
             {
-                startShiftY = another.y;
-                endShiftY = one.y;
+                startShiftY = another.Y;
+                endShiftY = one.Y;
             }
             else
             {
-                startShiftY = one.y;
-                endShiftY = another.y;
+                startShiftY = one.Y;
+                endShiftY = another.Y;
             }
             int startShiftX, endShiftX;
-            if (one.x > another.x)
+            if (one.X > another.X)
             {
-                startShiftX = another.x;
-                endShiftX = one.x;
+                startShiftX = another.X;
+                endShiftX = one.X;
             }
             else
             {
-                startShiftX = one.x;
-                endShiftX = another.x;
+                startShiftX = one.X;
+                endShiftX = another.X;
             }
             for (int shiftY = startShiftY; shiftY <= endShiftY; shiftY++)
                 for (int shiftX = startShiftX; shiftX <= endShiftX; shiftX++)
-                    yield return new Vector2Int(shiftX, shiftY);
+                    yield return new Point(shiftX, shiftY);
         }
         /// <summary>
         /// 4间隔枚举偏移量
@@ -125,11 +126,11 @@ namespace BugnityHelper.JigsawPuzzle
         /// <param name="fontgroundSize">前景尺寸</param>
         /// <param name="backgroundSize">后景尺寸</param>
         /// <returns>偏移量</returns>
-        private static IEnumerable<Vector2Int> Interval4(Vector2Int fontgroundSize, Vector2Int backgroundSize)
+        private static IEnumerable<Point> Interval4(Point fontgroundSize, Point backgroundSize)
         {
-            for (int shiftY = 0; shiftY <= backgroundSize.y - fontgroundSize.y; shiftY += 4)
-                for (int shiftX = 0; shiftX <= backgroundSize.x - fontgroundSize.x; shiftX += 4)
-                    yield return new Vector2Int(shiftX, shiftY);
+            for (int shiftY = 0; shiftY <= backgroundSize.Y - fontgroundSize.Y; shiftY += 4)
+                for (int shiftX = 0; shiftX <= backgroundSize.X - fontgroundSize.X; shiftX += 4)
+                    yield return new Point(shiftX, shiftY);
         }
         /// <summary>
         /// 12间隔枚举偏移量
@@ -138,11 +139,11 @@ namespace BugnityHelper.JigsawPuzzle
         /// <param name="fontgroundSize">前景尺寸</param>
         /// <param name="backgroundSize">后景尺寸</param>
         /// <returns>偏移量</returns>
-        private static IEnumerable<Vector2Int> Interval12(Vector2Int fontgroundSize, Vector2Int backgroundSize)
+        private static IEnumerable<Point> Interval12(Point fontgroundSize, Point backgroundSize)
         {
-            for (int shiftY = 0; shiftY <= backgroundSize.y - fontgroundSize.y; shiftY += 12)
-                for (int shiftX = 0; shiftX <= backgroundSize.x - fontgroundSize.x; shiftX += 12)
-                    yield return new Vector2Int(shiftX, shiftY);
+            for (int shiftY = 0; shiftY <= backgroundSize.Y - fontgroundSize.Y; shiftY += 12)
+                for (int shiftX = 0; shiftX <= backgroundSize.X - fontgroundSize.X; shiftX += 12)
+                    yield return new Point(shiftX, shiftY);
         }
         /// <summary>
         /// 6次随机枚举偏移量
@@ -151,13 +152,13 @@ namespace BugnityHelper.JigsawPuzzle
         /// <param name="fontgroundSize">前景尺寸</param>
         /// <param name="backgroundSize">后景尺寸</param>
         /// <returns>偏移量</returns>
-        private static IEnumerable<Vector2Int> Random6(Vector2Int fontgroundSize, Vector2Int backgroundSize)
+        private static IEnumerable<Point> Random6(Point fontgroundSize, Point backgroundSize)
         {
-            System.Random random = new System.Random();
-            int deltaX = backgroundSize.x - fontgroundSize.x + 1;
-            int deltaY = backgroundSize.y - fontgroundSize.y + 1;
+            Random random = new Random();
+            int deltaX = backgroundSize.X - fontgroundSize.X + 1;
+            int deltaY = backgroundSize.Y - fontgroundSize.Y + 1;
             for (int i = 0; i < 6; i++)
-                yield return new Vector2Int(random.Next(0, deltaX), random.Next(0, deltaY));
+                yield return new Point(random.Next(0, deltaX), random.Next(0, deltaY));
         }
         /// <summary>
         /// 32次随机枚举偏移量
@@ -166,53 +167,53 @@ namespace BugnityHelper.JigsawPuzzle
         /// <param name="fontgroundSize">前景尺寸</param>
         /// <param name="backgroundSize">后景尺寸</param>
         /// <returns>偏移量</returns>
-        private static IEnumerable<Vector2Int> Random32(Vector2Int fontgroundSize, Vector2Int backgroundSize)
+        private static IEnumerable<Point> Random32(Point fontgroundSize, Point backgroundSize)
         {
-            System.Random random = new System.Random();
-            int deltaX = backgroundSize.x - fontgroundSize.x + 1;
-            int deltaY = backgroundSize.y - fontgroundSize.y + 1;
+            Random random = new Random();
+            int deltaX = backgroundSize.X - fontgroundSize.X + 1;
+            int deltaY = backgroundSize.Y - fontgroundSize.Y + 1;
             for (int i = 0; i < 32; i++)
-                yield return new Vector2Int(random.Next(0, deltaX), random.Next(0, deltaY));
+                yield return new Point(random.Next(0, deltaX), random.Next(0, deltaY));
         }
 
-        public static IEnumerable<Vector2Int> EnumItNearly(
-            Vector2Int fontgroundSize, Vector2Int backgroundSize,
-            Vector2Int position, int maxDistance = 1)
+        public static IEnumerable<Point> EnumItNearly(
+            Point fontgroundSize, Point backgroundSize,
+            Point position, int maxDistance = 1)
         {
             int minDeltaX, maxDeltaX;
-            if (position.x - maxDistance > 0)
-                minDeltaX = position.x - maxDistance;
+            if (position.X - maxDistance > 0)
+                minDeltaX = position.X - maxDistance;
             else
                 minDeltaX = 0;
-            if (backgroundSize.x - fontgroundSize.x > position.x + maxDistance)
-                maxDeltaX = position.x + maxDistance;
+            if (backgroundSize.X - fontgroundSize.X > position.X + maxDistance)
+                maxDeltaX = position.X + maxDistance;
             else
-                maxDeltaX = backgroundSize.x - fontgroundSize.x;
+                maxDeltaX = backgroundSize.X - fontgroundSize.X;
 
             int minDeltaY, maxDeltaY;
-            if (position.x - maxDistance > 0)
-                minDeltaY = position.y - maxDistance;
+            if (position.X - maxDistance > 0)
+                minDeltaY = position.Y - maxDistance;
             else
                 minDeltaY = 0;
-            if (backgroundSize.y - fontgroundSize.y > position.y + maxDistance)
-                maxDeltaY = position.y + maxDistance;
+            if (backgroundSize.Y - fontgroundSize.Y > position.Y + maxDistance)
+                maxDeltaY = position.Y + maxDistance;
             else
-                maxDeltaY = backgroundSize.y - fontgroundSize.y;
+                maxDeltaY = backgroundSize.Y - fontgroundSize.Y;
 
             // 我曾经写过一次螺旋线遍历，用的是四条斜线
             // 那次经历给我留下痛苦的回忆，所以我选择更费电的写法
             for (int shiftY = minDeltaY; shiftY <= maxDeltaY; shiftY++)
                 for (int shiftX = minDeltaX; shiftX <= maxDeltaX; shiftX++)
                 {
-                    Vector2Int targetPosition = new Vector2Int(shiftX, shiftY);
+                    Point targetPosition = new Point(shiftX, shiftY);
                     if (NearlyButNotEqual(targetPosition))
                         yield return targetPosition;
                 }
 
-            bool NearlyButNotEqual(Vector2Int targetPosition)
+            bool NearlyButNotEqual(Point targetPosition)
             {
-                int distanceX = targetPosition.x - position.x;
-                int distanceY = targetPosition.y - position.y;
+                int distanceX = targetPosition.X - position.X;
+                int distanceY = targetPosition.Y - position.Y;
                 distanceX = distanceX > 0 ? distanceX : -distanceX;
                 distanceY = distanceY > 0 ? distanceY : -distanceY;
                 int distance = distanceX + distanceY;

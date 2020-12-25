@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
 
-namespace JigsawPuzzleMVC.Controllers
+namespace JigsawPuzzle.Controllers
 {
     public class HomeController : Controller
     {

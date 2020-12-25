@@ -12,7 +12,7 @@ namespace BugnityHelper.JigsawPuzzle
         public Vector4[,] Fontground { get; protected set; }
         public Vector2Int? PreferredPosition;
 
-        /* func */
+        /* ctor */
         protected SpriteMatch(Vector4[,] background, Vector4[,] fontground)
         {
             Background = background ?? throw new ArgumentNullException(nameof(background));

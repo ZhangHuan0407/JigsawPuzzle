@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace BugnityHelper.JigsawPuzzle
+namespace JigsawPuzzle
 {
     [CustomEditor(typeof(JigsawPuzzleAsset))]
     public class JigsawPuzzleAssetEditor : Editor

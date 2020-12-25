@@ -4,7 +4,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace BugnityHelper.JigsawPuzzle
+namespace JigsawPuzzle
 {
     public class JigsawPuzzleAsset : ScriptableObject
     {

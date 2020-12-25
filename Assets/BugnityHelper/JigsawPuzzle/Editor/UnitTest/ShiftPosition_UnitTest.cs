@@ -1,81 +1,80 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Text;
 
-namespace BugnityHelper.JigsawPuzzle.UnitTest
+namespace JigsawPuzzle.UnitTest
 {
     public class ShiftPosition_UnitTest
     {
-        public static List<(Vector2Int, Vector2Int)> Size = new List<(Vector2Int, Vector2Int)>()
+        public static List<(Point, Point)> Size = new List<(Point, Point)>()
         {
-            (new Vector2Int(5, 5), new Vector2Int(8, 8)),
-            (new Vector2Int(5, 8), new Vector2Int(8, 8)),
-            (new Vector2Int(8, 6), new Vector2Int(8, 8)),
-            (new Vector2Int(7, 7), new Vector2Int(8, 8)),
+            (new Point(5, 5), new Point(8, 8)),
+            (new Point(5, 8), new Point(8, 8)),
+            (new Point(8, 6), new Point(8, 8)),
+            (new Point(7, 7), new Point(8, 8)),
 
-            (new Vector2Int(1, 1), new Vector2Int(4, 4)),
-            (new Vector2Int(1, 8), new Vector2Int(8, 8)),
-            (new Vector2Int(8, 1), new Vector2Int(8, 8)),
-            (new Vector2Int(8, 8), new Vector2Int(8, 8)),
+            (new Point(1, 1), new Point(4, 4)),
+            (new Point(1, 8), new Point(8, 8)),
+            (new Point(8, 1), new Point(8, 8)),
+            (new Point(8, 8), new Point(8, 8)),
         };
 
-        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(EnumPositionPropensity.LineByLine))]
+        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.LineByLine))]
         public static void ShiftPositionShouldLineByLine()
         {
             StringBuilder builder = new StringBuilder(200);
-            foreach ((Vector2Int, Vector2Int) size in Size)
+            foreach ((Point, Point) size in Size)
             {
-                IEnumerable<Vector2Int> shiftPosition = ShiftPosition.EnumIt(size.Item1, size.Item2, EnumPositionPropensity.LineByLine);
+                IEnumerable<Point> shiftPosition = ShiftPosition.EnumIt(size.Item1, size.Item2, ShiftPositionPropensity.LineByLine);
                 builder.AppendLine($"font : {size.Item1}, back : {size.Item2}");
-                foreach (Vector2Int position in shiftPosition)
+                foreach (Point position in shiftPosition)
                     builder.AppendLine(position.ToString());
                 Debug.Log(builder.ToString());
                 builder.Clear();
             }
         }
-        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(EnumPositionPropensity.Tween))]
+        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.Tween))]
         public static void ShiftPositionShouldTween()
         {
             StringBuilder builder = new StringBuilder(200);
-            foreach ((Vector2Int, Vector2Int) size in Size)
+            foreach ((Point, Point) size in Size)
             {
-                IEnumerable<Vector2Int> shiftPosition = ShiftPosition.EnumIt(size.Item1, size.Item2, EnumPositionPropensity.Tween);
+                IEnumerable<Point> shiftPosition = ShiftPosition.EnumIt(size.Item1, size.Item2, ShiftPositionPropensity.Tween);
                 builder.AppendLine($"font : {size.Item1}, back : {size.Item2}");
-                foreach (Vector2Int position in shiftPosition)
+                foreach (Point position in shiftPosition)
                     builder.AppendLine(position.ToString());
                 Debug.Log(builder.ToString());
                 builder.Clear();
             }
         }
-        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(EnumPositionPropensity.Interval4))]
+        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.Interval4))]
         public static void ShiftPositionShouldInterval4()
         {
             StringBuilder builder = new StringBuilder(200);
-            foreach ((Vector2Int, Vector2Int) size in Size)
+            foreach ((Point, Point) size in Size)
             {
-                Vector2Int fontgroundSize = size.Item1 * 10;
-                Vector2Int backgroundSize = size.Item2 * 10;
-                IEnumerable<Vector2Int> shiftPosition = ShiftPosition.EnumIt(fontgroundSize, backgroundSize, EnumPositionPropensity.Interval4);
+                Point fontgroundSize = size.Item1 * 10;
+                Point backgroundSize = size.Item2 * 10;
+                IEnumerable<Point> shiftPosition = ShiftPosition.EnumIt(fontgroundSize, backgroundSize, ShiftPositionPropensity.Interval4);
                 builder.AppendLine($"font : {fontgroundSize}, back : {backgroundSize}");
-                foreach (Vector2Int position in shiftPosition)
+                foreach (Point position in shiftPosition)
                     builder.AppendLine(position.ToString());
                 Debug.Log(builder.ToString());
                 builder.Clear();
             }
         }
-        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(EnumPositionPropensity.Random6))]
+        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.Random6))]
         public static void ShiftPositionShouldRandom6()
         {
             StringBuilder builder = new StringBuilder(200);
-            foreach ((Vector2Int, Vector2Int) size in Size)
+            foreach ((Point, Point) size in Size)
             {
-                Vector2Int fontgroundSize = size.Item1 * 10;
-                Vector2Int backgroundSize = size.Item2 * 10;
-                IEnumerable<Vector2Int> shiftPosition = ShiftPosition.EnumIt(fontgroundSize, backgroundSize, EnumPositionPropensity.Random6);
+                Point fontgroundSize = size.Item1 * 10;
+                Point backgroundSize = size.Item2 * 10;
+                IEnumerable<Point> shiftPosition = ShiftPosition.EnumIt(fontgroundSize, backgroundSize, ShiftPositionPropensity.Random6);
                 builder.AppendLine($"font : {fontgroundSize}, back : {backgroundSize}");
-                foreach (Vector2Int position in shiftPosition)
+                foreach (Point position in shiftPosition)
                     builder.AppendLine(position.ToString());
                 Debug.Log(builder.ToString());
                 builder.Clear();
@@ -86,17 +85,17 @@ namespace BugnityHelper.JigsawPuzzle.UnitTest
         public static void ShiftPositionShouldEnumItNearly()
         {
             StringBuilder builder = new StringBuilder(200);
-            Vector2Int fontgroundSize = new Vector2Int(5, 5);
-            Vector2Int backgroundSize = new Vector2Int(Random.Range(5, 10), Random.Range(5, 10));
-            Vector2Int randomPoint = new Vector2Int(
-                Random.Range(0, backgroundSize.x - fontgroundSize.x),
-                Random.Range(0, backgroundSize.y - fontgroundSize.y));
+            Point fontgroundSize = new Point(5, 5);
+            Point backgroundSize = new Point(Random.Range(5, 10), Random.Range(5, 10));
+            Point randomPoint = new Point(
+                Random.Range(0, backgroundSize.X - fontgroundSize.X),
+                Random.Range(0, backgroundSize.Y - fontgroundSize.Y));
             int maxDistance = Random.Range(1, 5);
-            IEnumerable<Vector2Int> shiftPosition = ShiftPosition.EnumItNearly(
+            IEnumerable<Point> shiftPosition = ShiftPosition.EnumItNearly(
                 fontgroundSize, backgroundSize,
                 randomPoint, maxDistance);
             builder.AppendLine($"font : {fontgroundSize}, back : {backgroundSize}, randomPoint : {randomPoint}, maxDistance : {maxDistance}");
-            foreach (Vector2Int position in shiftPosition)
+            foreach (Point position in shiftPosition)
                 builder.AppendLine(position.ToString());
             Debug.Log(builder.ToString());
             builder.Clear();
