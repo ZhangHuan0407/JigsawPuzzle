@@ -24,11 +24,14 @@ namespace JigsawPuzzle
         [HideInInspector]
         [SerializeField]
         private int Version;
+        [HideInInspector]
+        public string DataName;
 #else
         public string CreationTime;
         public string LastWriteTime;
         public SpriteInfo[] SpriteInfos;
         public int Version;
+        public string DataName;
 #endif
 
         /* inter */

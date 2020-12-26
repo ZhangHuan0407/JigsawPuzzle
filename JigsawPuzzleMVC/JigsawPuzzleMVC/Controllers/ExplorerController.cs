@@ -16,6 +16,7 @@ namespace JigsawPuzzle.Controllers
             return Task.Run(() =>
             {
                 Dictionary<string, string[]> fileMap = GetFileMap();
+                ViewData["FileMultiple"] = Session["FileMultiple"] ?? false;
                 return View(fileMap) as ActionResult;
             });
         }
@@ -53,7 +54,7 @@ namespace JigsawPuzzle.Controllers
         {
             return Task.Run(() =>
             {
-                string[] files = form.GetValues(nameof(File));
+                string[] files = form.GetValues(nameof(System.IO.File));
                 List<FileInfo> fileInfos = new List<FileInfo>();
                 string dataDirectory = PortConfig.Value.DataDirectory;
                 foreach (string filePath in files)
@@ -63,7 +64,7 @@ namespace JigsawPuzzle.Controllers
                         && fileInfo.FullName.StartsWith(dataDirectory))
                         fileInfos.Add(fileInfo);
                 }
-                Session[nameof(File)] = fileInfos.ToArray();
+                Session[nameof(FileInfo)] = fileInfos.ToArray();
                 string[] redirectAction = Session[nameof(Redirect)] as string[];
                 Session[nameof(Redirect)] = null;
                 if (redirectAction is null)

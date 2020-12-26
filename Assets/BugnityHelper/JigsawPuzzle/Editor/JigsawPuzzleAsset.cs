@@ -64,7 +64,8 @@ namespace JigsawPuzzle
             InfoData = new JigsawPuzzleInfoData()
             {
                 SpriteInfos = new SpriteInfo[Sprites.Length + 1],
-        };
+                DataName = DataName,
+            };
             SpriteInfo[] spriteInfos = InfoData.SpriteInfos;
             spriteInfos[0] = new SpriteInfo(Effect, true);
             for (int index = 0; index < Sprites.Length; index++)
@@ -80,7 +81,7 @@ namespace JigsawPuzzle
 
             InfoData.UpdateTime();
 
-            string content = EditorJsonUtility.ToJson(InfoData, true);
+            string content = JsonUtility.ToJson(InfoData, true);
             File.WriteAllText(InfoDataFullName, content);
         }
         public void RemoveDataFiles() 

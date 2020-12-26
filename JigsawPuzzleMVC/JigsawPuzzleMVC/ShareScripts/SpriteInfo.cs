@@ -26,6 +26,7 @@ namespace JigsawPuzzle
         /* inter */
         public long ColorDataLength => JPColor.FileDataPreJPColor * Width * Height;
         public int PixelCount => Width * Height;
+        public long ColorDataEndPosition => ColorDataStartPosition + ColorDataLength;
 
         /* ctor */
 #if UNITY_EDITOR

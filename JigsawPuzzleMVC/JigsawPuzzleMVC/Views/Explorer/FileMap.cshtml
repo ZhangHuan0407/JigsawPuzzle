@@ -2,6 +2,7 @@
 
 @{
     ViewBag.Title = "FileMap";
+    bool Multiple = (bool)ViewData["FileMultiple"];
 }
 
 <h4>Explorer Files</h4>
@@ -10,7 +11,7 @@
         Html.BeginForm("SelectFiles", "Explorer");
         foreach (var pair in Model)
         {
-            var fileList = new JigsawPuzzle.Models.FileList(pair.Key, pair.Value);
+            var fileList = new JigsawPuzzle.Models.FileList(pair.Key, pair.Value, Multiple);
             Html.RenderPartial("FileSystem/FileList", fileList);
         }
         <input type="submit" name="SubmitButton" value="Submit" />
