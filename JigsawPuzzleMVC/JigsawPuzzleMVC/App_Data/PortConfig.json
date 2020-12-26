@@ -1,0 +1,6 @@
+﻿{
+  "PortName": "IEnumerator",
+  "DataDirectory": "UserData",
+  "MaxOfConcurrentTasks": "4", // > 0
+  "MaxOfProcessMemory": "1000" // MB
+}

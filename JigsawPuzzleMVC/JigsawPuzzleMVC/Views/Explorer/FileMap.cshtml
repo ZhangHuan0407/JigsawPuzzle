@@ -1,0 +1,19 @@
+﻿@model Dictionary<string, string[]>
+
+@{
+    ViewBag.Title = "FileMap";
+}
+
+<h4>Explorer Files</h4>
+<div>
+    @{ 
+        Html.BeginForm("SelectFiles", "Explorer");
+        foreach (var pair in Model)
+        {
+            var fileList = new JigsawPuzzle.Models.FileList(pair.Key, pair.Value);
+            Html.RenderPartial("FileSystem/FileList", fileList);
+        }
+        <input type="submit" name="SubmitButton" value="Submit" />
+        Html.EndForm();
+    }
+</div>
