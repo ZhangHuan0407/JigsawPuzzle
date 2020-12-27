@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace JigsawPuzzle
 {
-    [ShareScripts]
+    [ShareScript]
     internal class JPTask
     {
         /* field */

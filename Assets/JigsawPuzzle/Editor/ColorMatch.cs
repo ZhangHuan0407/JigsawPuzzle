@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace JigsawPuzzle
 {
-    [ShareScripts]
+    [ShareScript]
     public abstract class ColorMatch<Value> where Value : new()
     {
         /* field */

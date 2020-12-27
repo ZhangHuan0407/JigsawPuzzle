@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 #if UNITY_EDITOR
@@ -10,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace JigsawPuzzle
 {
-    [ShareScripts]
+    [ShareScript]
     internal class JPTask
     {
         /* field */
@@ -87,7 +88,6 @@ namespace JigsawPuzzle
         }
         private void PredictLayout()
         {
-
         }
         private void FreeTemp()
         {
@@ -96,6 +96,7 @@ namespace JigsawPuzzle
         }
         private void WriteOutResult()
         {
+            JPInfoData.UpdateTime();
 #if UNITY_EDITOR
             string contents = JsonUtility.ToJson(JPInfoData);
 #else

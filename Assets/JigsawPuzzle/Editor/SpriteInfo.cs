@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace JigsawPuzzle
 {
-    [ShareScripts]
+    [ShareScript]
     [Serializable]
     public class SpriteInfo
     {

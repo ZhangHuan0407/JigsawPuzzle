@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace JigsawPuzzle
 {
-    [ShareScripts]
+    [ShareScript]
     [Serializable]
     public class JigsawPuzzleInfoData
     {
@@ -47,14 +47,12 @@ namespace JigsawPuzzle
         }
 
         /* func */
-#if UNITY_EDITOR
         public void UpdateTime()
         {
             if (string.IsNullOrWhiteSpace(CreationTime))
                 CreationTime = DateTime.Now.ToString();
             LastWriteTime = DateTime.Now.ToString();
         }
-#endif
 
         public long SpriteInfosBinDataLength()
         {

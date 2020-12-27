@@ -1,6 +1,6 @@
 ﻿namespace JigsawPuzzle
 {
-    [ShareScripts]
+    [ShareScript]
     public struct Point
     {
         /* field */

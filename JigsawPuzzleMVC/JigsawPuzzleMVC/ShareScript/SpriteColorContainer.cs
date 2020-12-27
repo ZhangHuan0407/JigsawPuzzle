@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace JigsawPuzzle
 {
-    [ShareScripts]
+    [ShareScript]
     public class SpriteColorContainer
     {
         /* field */
