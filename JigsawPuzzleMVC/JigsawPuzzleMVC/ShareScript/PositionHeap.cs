@@ -52,5 +52,12 @@ namespace JigsawPuzzle
             if (PositionList.Count > Capacity)
                 PositionList.RemoveFirst();
         }
+
+        internal (Point, float)[] ToArray()
+        {
+            (Point, float)[] copy = new (Point, float)[PositionList.Count];
+            PositionList.CopyTo(copy, 0);
+            return copy;
+        }
     }
 }

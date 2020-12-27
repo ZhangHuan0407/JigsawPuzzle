@@ -37,12 +37,15 @@ namespace JigsawPuzzle
         public PositionHeap PreferredPositiosn;
         [HideInInspector]
         public float MaxSqrMagnitude;
+        [HideInInspector]
+        public int AccurateDistance;
 #else
         public int TotalNumberOfPossibilities;
         public ShiftPositionPropensity PretreatmentPropensity;
         public ShiftPositionPropensity Propensity;
         public PositionHeap PreferredPositiosn;
         public float MaxSqrMagnitude;
+        public int AccurateDistance;
 #endif
         #endregion
 

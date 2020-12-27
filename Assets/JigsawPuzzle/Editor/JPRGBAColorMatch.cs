@@ -25,15 +25,28 @@ namespace JigsawPuzzle
         }
 
         /* func */
-        public override float GetDeltaValue(JPColor effectColor, JPColor spriteColor) =>
+        protected override float GetDeltaValue(JPColor effectColor, JPColor spriteColor) =>
             JPColor.RGBADelta(effectColor, spriteColor).SqrMagnitude;
-        public override bool ValueMapIsBetter(float[,] valueMap, out float averageValue)
+        protected override bool ValueMapIsBetter(float[,] valueMap, out float averageValue)
         {
             float value = 0f;
             foreach (float add in valueMap)
                 value += add;
             averageValue = value / valueMap.Length;
             return averageValue < MaxSqrMagnitude;
+        }
+
+        public override (Point, float) BestOne()
+        {
+            Point bestPoint = new Point();
+            float minValue = 1f;
+            foreach ((Point, float) position in PreferredPosition)
+                if (position.Item2 < minValue)
+                {
+                    bestPoint = position.Item1;
+                    minValue = position.Item2;
+                }
+            return (bestPoint, minValue);
         }
     }
 }

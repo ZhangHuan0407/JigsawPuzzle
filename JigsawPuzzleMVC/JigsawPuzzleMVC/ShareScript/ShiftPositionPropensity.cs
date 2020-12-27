@@ -22,24 +22,24 @@ namespace JigsawPuzzle
         /// </summary>
         Tween = 0x0010,
         /// <summary>
-        /// 4间隔枚举偏移量
+        /// 2间隔，3偏移量枚举
         /// </summary>
-        Interval4 = 0x0100,
+        Interval3 = 0x0100,
         /// <summary>
-        /// 8间隔枚举偏移量
+        /// 8间隔，9偏移量移量
         /// </summary>
-        Interval8 = 0x0200,
+        Interval9 = 0x0200,
         /// <summary>
         /// 16次随机枚举偏移量
         /// </summary>
-        Random16 = 0x1000,
+        Random16 = 0x0400,
         /// <summary>
         /// 64次随机枚举偏移量
         /// </summary>
-        Random64 = 0x2000,
+        Random64 = 0x0800,
         /// <summary>
         /// 64次随机枚举偏移量
         /// </summary>
-        Random256 = 0x4000,
+        Random256 = 0x0F00,
     }
 }

@@ -104,25 +104,29 @@ namespace JigsawPuzzle
                 if (times > 900000)
                 {
                     spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Random256;
-                    spriteInfo.Propensity = ShiftPositionPropensity.Interval8;
+                    spriteInfo.Propensity = ShiftPositionPropensity.Interval9;
+                    spriteInfo.AccurateDistance = 4;
                     spriteInfo.PreferredPositiosn = new PositionHeap(10);
                 }
                 else if (times > 450000)
                 {
                     spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Random64;
-                    spriteInfo.Propensity = ShiftPositionPropensity.Interval8;
+                    spriteInfo.Propensity = ShiftPositionPropensity.Interval9;
+                    spriteInfo.AccurateDistance = 4;
                     spriteInfo.PreferredPositiosn = new PositionHeap(6);
                 }
                 else if (times > 100000)
                 {
                     spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Random16;
-                    spriteInfo.Propensity = ShiftPositionPropensity.Interval4;
+                    spriteInfo.Propensity = ShiftPositionPropensity.Interval3;
+                    spriteInfo.AccurateDistance = 1;
                     spriteInfo.PreferredPositiosn = new PositionHeap(4);
                 }
                 else
                 {
                     spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.None;
-                    spriteInfo.Propensity = ShiftPositionPropensity.Interval4;
+                    spriteInfo.Propensity = ShiftPositionPropensity.Interval3;
+                    spriteInfo.AccurateDistance = 1;
                     spriteInfo.PreferredPositiosn = new PositionHeap(2);
                 }
             }
@@ -171,7 +175,18 @@ namespace JigsawPuzzle
                 foreach ((Point, float) capture in match)
                     spriteInfo.PreferredPositiosn.AddMinItem(capture.Item1, capture.Item2);
 
-
+                (Point, float)[] preferredPositiosn = spriteInfo.PreferredPositiosn.ToArray();
+                foreach ((Point, float) position in preferredPositiosn)
+                {
+                    JPRGBAColorMatch accurateMatch = new JPRGBAColorMatch(
+                    effectSpriteColor,
+                    SpriteColor[spriteInfo],
+                    ShiftPositionPropensity.None,
+                    position.Item2);
+                    accurateMatch.TryGetNearlyPreferredPosition(position.Item1, spriteInfo.AccurateDistance);
+                    (Point, float) bestPosition = accurateMatch.BestOne();
+                    spriteInfo.PreferredPositiosn.AddMinItem(bestPosition.Item1, bestPosition.Item2);
+                }
             }
         }
         [Obsolete("当前此方法不具有实际功能")]
