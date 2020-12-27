@@ -9,7 +9,7 @@ namespace JigsawPuzzle
     public class JigsawPuzzleAsset : ScriptableObject
     {
         /* const */
-        public const string AssetDirectory = "Assets/Editor Default Resources/BugnityHelper/JigsawPuzzle/TaskAndData";
+        public const string AssetDirectory = "Assets/Editor Default Resources/JigsawPuzzle/TaskAndData";
 
         /* field */
         [Tooltip("效果图")]

@@ -64,15 +64,15 @@ namespace JigsawPuzzle.UnitTest
                 builder.Clear();
             }
         }
-        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.Random6))]
-        public static void ShiftPositionShouldRandom6()
+        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.Random16))]
+        public static void ShiftPositionShouldRandom16()
         {
             StringBuilder builder = new StringBuilder(200);
             foreach ((Point, Point) size in Size)
             {
                 Point fontgroundSize = size.Item1 * 10;
                 Point backgroundSize = size.Item2 * 10;
-                IEnumerable<Point> shiftPosition = ShiftPosition.EnumIt(fontgroundSize, backgroundSize, ShiftPositionPropensity.Random6);
+                IEnumerable<Point> shiftPosition = ShiftPosition.EnumIt(fontgroundSize, backgroundSize, ShiftPositionPropensity.Random16);
                 builder.AppendLine($"font : {fontgroundSize}, back : {backgroundSize}");
                 foreach (Point position in shiftPosition)
                     builder.AppendLine(position.ToString());

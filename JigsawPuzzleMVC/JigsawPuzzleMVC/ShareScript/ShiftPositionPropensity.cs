@@ -10,6 +10,10 @@ namespace JigsawPuzzle
     public enum ShiftPositionPropensity
     {
         /// <summary>
+        /// 空标记
+        /// </summary>
+        None = 0x0000,
+        /// <summary>
         /// 逐行枚举偏移量
         /// </summary>
         LineByLine = 0x0001,
@@ -22,16 +26,20 @@ namespace JigsawPuzzle
         /// </summary>
         Interval4 = 0x0100,
         /// <summary>
-        /// 12间隔枚举偏移量
+        /// 8间隔枚举偏移量
         /// </summary>
-        Interval12 = 0x0200,
+        Interval8 = 0x0200,
         /// <summary>
-        /// 6次随机枚举偏移量
+        /// 16次随机枚举偏移量
         /// </summary>
-        Random6 = 0x1000,
+        Random16 = 0x1000,
         /// <summary>
-        /// 32次随机枚举偏移量
+        /// 64次随机枚举偏移量
         /// </summary>
-        Random32 = 0x2000,
+        Random64 = 0x2000,
+        /// <summary>
+        /// 64次随机枚举偏移量
+        /// </summary>
+        Random256 = 0x4000,
     }
 }

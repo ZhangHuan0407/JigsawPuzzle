@@ -32,22 +32,25 @@ namespace JigsawPuzzle.UnitTest
             }
             foreach (string scriptFilePath in scriptFilesPath)
             {
-                bool mvcScriptsExists = File.Exists($"{MVCShareScriptDirectory}/{scriptFilePath}");
-                bool unityScriptsExists = File.Exists($"{UnityShareScriptDirectory}/{scriptFilePath}");
-                if (!mvcScriptsExists
-                    || !unityScriptsExists)
+                string mvcScriptFilePath = $"{MVCShareScriptDirectory}/{scriptFilePath}";
+                bool mvcScriptFileExists = File.Exists(mvcScriptFilePath);
+                string unityScriptFilePath = $"{UnityShareScriptDirectory}/{scriptFilePath}";
+                bool unityScriptFileExists = File.Exists(unityScriptFilePath);
+                if (!mvcScriptFileExists
+                    || !unityScriptFileExists)
                 {
-                    Debug.LogError($"File not found, {scriptFilePath}\n MVC : {mvcScriptsExists}, Unity : {unityScriptsExists}");
+                    Debug.LogError($"File not found, {scriptFilePath}\n MVC : {mvcScriptFileExists}, Unity : {unityScriptFileExists}");
                     continue;
                 }
-
+                if (!File.ReadAllText(mvcScriptFilePath).Equals(File.ReadAllText(unityScriptFilePath)))
+                {
+                    string mvcLastWriteTime = new FileInfo(mvcScriptFilePath).LastWriteTime.ToString();
+                    string unityLastWriteTime = new FileInfo(unityScriptFilePath).LastWriteTime.ToString();
+                    Debug.LogError($"File is not equal, {scriptFilePath}\n MVC : {mvcScriptFileExists} LastWriteTime : {mvcLastWriteTime}, Unity : {unityScriptFileExists} LastWriteTime : {unityLastWriteTime}");
+                    continue;
+                }
             }
-        }
-
-        [MenuItem("Unit Test/" + nameof(ShareScriptAttribute) + "/1")]
-        public static void ShareScriptsShoul11111111l()
-        {
-
+            Debug.Log("Finish");
         }
     }
 }

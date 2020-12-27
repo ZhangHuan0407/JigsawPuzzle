@@ -13,6 +13,7 @@ namespace JigsawPuzzle
         /* const */
 
         /* field */
+        #region RawData
         public bool IsEffect;
         public string SpriteFullPath;
 
@@ -22,6 +23,28 @@ namespace JigsawPuzzle
         public int TexturePosY;
 
         public long ColorDataStartPosition;
+        #endregion RawData
+
+        #region  StatisticalData
+#if UNITY_EDITOR
+        [HideInInspector]
+        public int TotalNumberOfPossibilities;
+        [HideInInspector]
+        public ShiftPositionPropensity PretreatmentPropensity;
+        [HideInInspector]
+        public ShiftPositionPropensity Propensity;
+        [HideInInspector]
+        public PositionHeap PreferredPositiosn;
+        [HideInInspector]
+        public float MaxSqrMagnitude;
+#else
+        public int TotalNumberOfPossibilities;
+        public ShiftPositionPropensity PretreatmentPropensity;
+        public ShiftPositionPropensity Propensity;
+        public PositionHeap PreferredPositiosn;
+        public float MaxSqrMagnitude;
+#endif
+        #endregion
 
         /* inter */
         public long ColorDataLength => JPColor.FileDataPreJPColor * Width * Height;

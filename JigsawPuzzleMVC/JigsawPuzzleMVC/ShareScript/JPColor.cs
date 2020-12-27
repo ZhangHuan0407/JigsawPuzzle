@@ -21,5 +21,16 @@
             S = data[startIndex++] / 255f;
             V = data[startIndex++] / 255f;
         }
+
+        /* inter */
+
+        /* func */
+        public static JPVector3 RGBADelta(JPColor left, JPColor right) =>
+            new JPVector3(
+                (left.R - right.R) * right.A,
+                (left.G - right.G) * right.A,
+                (left.B - right.B) * right.A);
+
+
     }
 }

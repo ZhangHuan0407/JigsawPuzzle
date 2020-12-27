@@ -13,9 +13,10 @@ namespace JigsawPuzzle
                 { ShiftPositionPropensity.LineByLine,    LineByLine },
                 { ShiftPositionPropensity.Tween,         Tween },
                 { ShiftPositionPropensity.Interval4,     Interval4 },
-                { ShiftPositionPropensity.Interval12,    Interval12 },
-                { ShiftPositionPropensity.Random6,       Random6 },
-                { ShiftPositionPropensity.Random32,      Random32 },
+                { ShiftPositionPropensity.Interval8,     Interval8 },
+                { ShiftPositionPropensity.Random16,      Random16 },
+                { ShiftPositionPropensity.Random64,      Random64 },
+                { ShiftPositionPropensity.Random256,     Random256 },
             };
 
         /* func */
@@ -100,46 +101,61 @@ namespace JigsawPuzzle
                     yield return new Point(shiftX, shiftY);
         }
         /// <summary>
-        /// 12间隔枚举偏移量
+        /// 8间隔枚举偏移量
         /// <para>先移动x, 再移动y, 包含边界值</para>
         /// </summary>
         /// <param name="fontgroundSize">前景尺寸</param>
         /// <param name="backgroundSize">后景尺寸</param>
         /// <returns>偏移量</returns>
-        private static IEnumerable<Point> Interval12(Point fontgroundSize, Point backgroundSize)
+        private static IEnumerable<Point> Interval8(Point fontgroundSize, Point backgroundSize)
         {
-            for (int shiftY = 0; shiftY <= backgroundSize.Y - fontgroundSize.Y; shiftY += 12)
-                for (int shiftX = 0; shiftX <= backgroundSize.X - fontgroundSize.X; shiftX += 12)
+            for (int shiftY = 0; shiftY <= backgroundSize.Y - fontgroundSize.Y; shiftY += 8)
+                for (int shiftX = 0; shiftX <= backgroundSize.X - fontgroundSize.X; shiftX += 8)
                     yield return new Point(shiftX, shiftY);
         }
         /// <summary>
-        /// 6次随机枚举偏移量
+        /// 16次随机枚举偏移量
         /// <para>包含边界值</para>
         /// </summary>
         /// <param name="fontgroundSize">前景尺寸</param>
         /// <param name="backgroundSize">后景尺寸</param>
         /// <returns>偏移量</returns>
-        private static IEnumerable<Point> Random6(Point fontgroundSize, Point backgroundSize)
+        private static IEnumerable<Point> Random16(Point fontgroundSize, Point backgroundSize)
         {
             Random random = new Random();
             int deltaX = backgroundSize.X - fontgroundSize.X + 1;
             int deltaY = backgroundSize.Y - fontgroundSize.Y + 1;
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 16; i++)
                 yield return new Point(random.Next(0, deltaX), random.Next(0, deltaY));
         }
         /// <summary>
-        /// 32次随机枚举偏移量
+        /// 64次随机枚举偏移量
         /// <para>包含边界值</para>
         /// </summary>
         /// <param name="fontgroundSize">前景尺寸</param>
         /// <param name="backgroundSize">后景尺寸</param>
         /// <returns>偏移量</returns>
-        private static IEnumerable<Point> Random32(Point fontgroundSize, Point backgroundSize)
+        private static IEnumerable<Point> Random64(Point fontgroundSize, Point backgroundSize)
         {
             Random random = new Random();
             int deltaX = backgroundSize.X - fontgroundSize.X + 1;
             int deltaY = backgroundSize.Y - fontgroundSize.Y + 1;
-            for (int i = 0; i < 32; i++)
+            for (int i = 0; i < 64; i++)
+                yield return new Point(random.Next(0, deltaX), random.Next(0, deltaY));
+        }
+        /// <summary>
+        /// 256次随机枚举偏移量
+        /// <para>包含边界值</para>
+        /// </summary>
+        /// <param name="fontgroundSize">前景尺寸</param>
+        /// <param name="backgroundSize">后景尺寸</param>
+        /// <returns>偏移量</returns>
+        private static IEnumerable<Point> Random256(Point fontgroundSize, Point backgroundSize)
+        {
+            Random random = new Random();
+            int deltaX = backgroundSize.X - fontgroundSize.X + 1;
+            int deltaY = backgroundSize.Y - fontgroundSize.Y + 1;
+            for (int i = 0; i < 256; i++)
                 yield return new Point(random.Next(0, deltaX), random.Next(0, deltaY));
         }
 
