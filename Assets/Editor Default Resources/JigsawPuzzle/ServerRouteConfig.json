@@ -1,39 +1,50 @@
 ﻿{
-  "BaseAddress": "http:///127.0.0.1",
-  "ServerRoute": {
-    "Dashboard": {
-      "GetDetailInfo": {
-        "ReturnContent": "JigsawPuzzle.Models.DashboardInfo",
-        "Type": "HttpGet"
-      }
+  "BaseAddress": "http://127.0.0.1/",
+  "WebAPI": [
+    //DashboardController
+    {
+      "Action": "GetDetailInfo",
+      "Controller": "Dashboard",
+      "FormKeys": [],
+      "FormValues": [],
+      "ReturnType": "JigsawPuzzle.Models.DashboardInfo",
+      "Type": "HttpGet"
     },
-    "Explorer": {
-      "GetFileMapJson": {
-        "ReturnType": "System.Collections.Generic.Dictionary<string, string[]>",
-        "Type": "HttpGet"
-      },
-      "SelectFiles": {
-        "ReturnType": "System.String",
-        "Form": {
-          "File": "System.String[]"
-        },
-        "Type": "HttpPost"
-      }
+
+    //ExplorerController
+    {
+      "Action": "GetFileMapJson",
+      "Controller": "Explorer",
+      "FormKeys": [],
+      "FormValues": [],
+      "ReturnType": "System.Collections.Generic.Dictionary<string, string[]>",
+      "Type": "HttpGet"
     },
-    "Task": {
-      "CreateNewData": {
-        "ReturnType": "System.String",
-        "Form": {
-          "Name": "System.String",
-          "InfoData": "JigsawPuzzleInfoData",
-          "BinData": "System.Byte[]"
-        },
-        "Type": "HttpPost"
-      },
-      "StartNew": {
-        "ReturnType": "System.String",
-        "Type": "HttpGet"
-      }
+    {
+      "Action": "SelectFiles",
+      "Controller": "Explorer",
+      "FormKeys": [ "File" ],
+      "FormValues": [ "System.String[]" ],
+      "ReturnType": "System.String",
+      "Type": "HttpPost"
+    },
+
+    //TaskController
+    {
+      "Action": "StartNew",
+      "Controller": "Task",
+      "FormKeys": [],
+      "FormValues": [],
+      "ReturnType": "System.String",
+      "Type": "HttpGet"
+    },
+    {
+      "Action": "CreateNewData",
+      "Controller": "Task",
+      "FormKeys": [ "Name", "InfoData", "BinData" ],
+      "FormValues": [ "System.String", "JigsawPuzzleInfoData", "System.Byte[]" ],
+      "ReturnType": "System.String",
+      "Type": "HttpPost"
     }
-  }
+  ]
 }

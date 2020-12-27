@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
 using System.Text;
+using UnityEditor;
+using UnityEngine;
 
 namespace JigsawPuzzle.UnitTest
 {
@@ -20,7 +20,7 @@ namespace JigsawPuzzle.UnitTest
             (new Point(8, 8), new Point(8, 8)),
         };
 
-        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.LineByLine))]
+        [MenuItem("Unit Test/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.LineByLine))]
         public static void ShiftPositionShouldLineByLine()
         {
             StringBuilder builder = new StringBuilder(200);
@@ -34,7 +34,7 @@ namespace JigsawPuzzle.UnitTest
                 builder.Clear();
             }
         }
-        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.Tween))]
+        [MenuItem("Unit Test/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.Tween))]
         public static void ShiftPositionShouldTween()
         {
             StringBuilder builder = new StringBuilder(200);
@@ -48,7 +48,7 @@ namespace JigsawPuzzle.UnitTest
                 builder.Clear();
             }
         }
-        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.Interval3))]
+        [MenuItem("Unit Test/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.Interval3))]
         public static void ShiftPositionShouldInterval3()
         {
             StringBuilder builder = new StringBuilder(200);
@@ -64,7 +64,7 @@ namespace JigsawPuzzle.UnitTest
                 builder.Clear();
             }
         }
-        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.Random16))]
+        [MenuItem("Unit Test/" + nameof(ShiftPosition) + "/" + nameof(ShiftPositionPropensity.Random16))]
         public static void ShiftPositionShouldRandom16()
         {
             StringBuilder builder = new StringBuilder(200);
@@ -81,7 +81,7 @@ namespace JigsawPuzzle.UnitTest
             }
         }
 
-        [MenuItem("Unit Test/" + nameof(JigsawPuzzle) + "/" + nameof(ShiftPosition) + "/" + nameof(ShiftPosition.EnumItNearly))]
+        [MenuItem("Unit Test/" + nameof(ShiftPosition) + "/" + nameof(ShiftPosition.EnumItNearly))]
         public static void ShiftPositionShouldEnumItNearly()
         {
             StringBuilder builder = new StringBuilder(200);

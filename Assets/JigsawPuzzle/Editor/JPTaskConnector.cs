@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 #if UNITY_EDITOR
@@ -12,7 +14,7 @@ using Newtonsoft.Json;
 namespace JigsawPuzzle
 {
     [ShareScript]
-    public sealed class JPTaskConnector
+    public sealed class JPTaskConnector : IEnumerable<ControllerAction>
     {
         /* const */
 #if UNITY_EDITOR
@@ -22,7 +24,7 @@ namespace JigsawPuzzle
 #endif
 
         /* field */
-        private readonly ServerRouteConfig ServerRoute;
+        internal readonly ServerRouteConfig ServerRouteConfig;
         private readonly HttpClient Client;
 
         private static readonly Dictionary<string, Func<object, HttpContent>> ObjectToHttpContent = new Dictionary<string, Func<object, HttpContent>>()
@@ -36,19 +38,35 @@ namespace JigsawPuzzle
         /// </summary>
         /// <param name="strUri">发送请求时使用的 Uri 地址</param>
         /// <param name="timeoutSeconds">超时时间，默认 5 秒</param>
-        public JPTaskConnector(string serverRouteConfig, int timeoutSeconds = 5)
+        public JPTaskConnector(string serverRouteContent, int timeoutSeconds = 5)
         {
-            if (string.IsNullOrWhiteSpace(serverRouteConfig))
-                throw new ArgumentException($"“{nameof(serverRouteConfig)}”不能为 Null 或空白", nameof(serverRouteConfig));
+            if (string.IsNullOrWhiteSpace(serverRouteContent))
+                throw new ArgumentException($"“{nameof(serverRouteContent)}”不能为 Null 或空白", nameof(serverRouteContent));
 
 #if UNITY_EDITOR
-            ServerRoute = JsonUtility.FromJson<ServerRouteConfig>(serverRouteConfig);
+            // Bugnity 读 json 数据的时候，如果有注释居然会报错 JSON parse error: Invalid value??
+            // Unity 这么大公司，你们的模板数据里面一行注释都没有??
+            // 你们代码可读性有0分吗?
+            // 目前支持单行注释
+            StringBuilder builder = new StringBuilder();
+            foreach (string line in serverRouteContent.Split('\n'))
+            {
+                if (line.TrimStart().StartsWith("//"))
+                    continue;
+                else
+                    builder.AppendLine(line);
+            }
+            serverRouteContent = builder.ToString();
+            ServerRouteConfig = JsonUtility.FromJson<ServerRouteConfig>(serverRouteContent);
+            // OnAfterDeserialize Invoke by unity
 #else
-            ServerRoute = JsonConvert.DeserializeObject<ServerRouteConfig>(serverRouteConfig);
+            ServerRouteConfig = JsonConvert.DeserializeObject<ServerRouteConfig>(serverRouteContent);
+            ServerRouteConfig.OnAfterDeserialize();
 #endif
+
             Client = new HttpClient()
             {
-                BaseAddress = ServerRoute.BaseAddress,
+                BaseAddress = ServerRouteConfig.BaseAddressUri,
                 MaxResponseContentBufferSize = 20 * 1024 * 1024,
                 Timeout = TimeSpan.FromSeconds(timeoutSeconds),
             };
@@ -62,10 +80,10 @@ namespace JigsawPuzzle
                 throw new ArgumentException($"{nameof(controller)}Can not be Null or white space", nameof(controller));
             if (string.IsNullOrWhiteSpace(action))
                 throw new ArgumentException($"{nameof(action)}Can not be Null or white space", nameof(action));
-            ControllerAction controllerAction = ServerRoute[controller, action];
+            ControllerAction controllerAction = ServerRouteConfig[controller, action];
             
             if (controllerAction is null)
-                throw new Exception($"Not found {controller}/{action} in {nameof(ServerRoute)}");
+                throw new Exception($"Not found {controller}/{action} in {nameof(ServerRouteConfig)}");
             else if (!controllerAction.Type.Equals("HttpGet"))
                 throw new Exception($"{controller}/{action} type is not equal.");
 
@@ -110,9 +128,9 @@ namespace JigsawPuzzle
             if (data is null)
                 throw new ArgumentNullException(nameof(data));
 
-            ControllerAction controllerAction = ServerRoute[controller, action];
+            ControllerAction controllerAction = ServerRouteConfig[controller, action];
             if (controllerAction is null)
-                throw new Exception($"Not found {controller}/{action} in {nameof(ServerRoute)}");
+                throw new Exception($"Not found {controller}/{action} in {nameof(ServerRouteConfig)}");
             else if (!controllerAction.Type.Equals("HttpPost"))
                 throw new Exception($"{controller}/{action} type is not equal.");
 
@@ -123,11 +141,11 @@ namespace JigsawPuzzle
                 try
                 {
                     MultipartFormDataContent form = new MultipartFormDataContent();
-                    foreach (KeyValuePair<string, string> parameterInfo in controllerAction)
+                    for (int index = 0; index < controllerAction.FormKeys.Length; index++)
                     {
-                        if (!data.TryGetValue(parameterInfo.Key, out object obj))
-                            throw new ArgumentNullException($"{parameterInfo.Key} is null.");
-                        form.Add(ObjectToHttpContent[parameterInfo.Value](obj), parameterInfo.Key);
+                        if (!data.TryGetValue(controllerAction.FormKeys[index], out object obj))
+                            throw new ArgumentNullException($"{controllerAction.FormKeys[index]} is null.");
+                        form.Add(ObjectToHttpContent[controllerAction.FormValues[index]](obj), controllerAction.FormKeys[index]);
                     }
                     responseMessage = Client.PostAsync($"{controller}/{action}", form);
 
@@ -162,5 +180,14 @@ namespace JigsawPuzzle
             else
                 throw new ArgumentException($"Argument type error, {nameof(obj)} :{obj?.GetType().FullName}");
         }
+
+        /* IEnumerable */
+        public IEnumerator<ControllerAction> GetEnumerator()
+        {
+            foreach (ControllerAction controllerAction in ServerRouteConfig.WebAPI)
+                yield return controllerAction;
+        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
     }
 }
