@@ -23,8 +23,9 @@ namespace JigsawPuzzle.UnitTest
                 "Dashboard", "GetDetailInfo",
                 (HttpResponseMessage message) => 
                 {
-                    Debug.Log("Finish Dashboard/GetDetailInfo");
-                    Debug.Log(message.ToString());
+                    Debug.Log($"Finish Dashboard/GetDetailInfo\n{message}");
+                    string data = message.Content.ReadAsStringAsync().Result;
+                    Debug.Log($"data :\n{data}");
                 },
                 (HttpResponseMessage message) => 
                 {

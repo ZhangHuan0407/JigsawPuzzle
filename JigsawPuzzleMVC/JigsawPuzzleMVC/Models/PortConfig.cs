@@ -7,6 +7,7 @@ using System.Web;
 
 namespace JigsawPuzzle.Models
 {
+    [Serializable]
     public class PortConfig
     {
         /* const */
@@ -37,11 +38,11 @@ namespace JigsawPuzzle.Models
         /// <summary>
         /// 服务器 IPv4 地址
         /// </summary>
-        public IPAddress ServerIPAddress { get; private set; }
+        public string ServerIPAddressV4 { get; private set; }
         /// <summary>
         /// 服务器 IPv6 地址
         /// </summary>
-        public IPAddress ServerIPAddressV6 { get; private set; }
+        public string ServerIPAddressV6 { get; private set; }
 
         /* func */
         public static void ReloadPortConfig()
@@ -62,9 +63,9 @@ namespace JigsawPuzzle.Models
             foreach (IPAddress iPAddress in Dns.GetHostAddresses(Dns.GetHostName()))
             {
                 if (iPAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-                    Value.ServerIPAddress = iPAddress;
+                    Value.ServerIPAddressV4 = iPAddress.ToString();
                 else if (iPAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
-                    Value.ServerIPAddressV6 = iPAddress;
+                    Value.ServerIPAddressV6 = iPAddress.ToString();
             }
         }
 
@@ -76,7 +77,7 @@ namespace JigsawPuzzle.Models
                 .AppendLine($"{nameof(DataDirectory)} : {DataDirectory}")
                 .AppendLine($"{nameof(MaxOfConcurrentTasks)} : {MaxOfConcurrentTasks}")
                 .AppendLine($"{nameof(MaxOfProcessMemory)} : {MaxOfProcessMemory}")
-                .AppendLine($"{nameof(ServerIPAddress)} : {ServerIPAddress}")
+                .AppendLine($"{nameof(ServerIPAddressV4)} : {ServerIPAddressV4}")
                 .AppendLine($"{nameof(ServerIPAddressV6)} : {ServerIPAddressV6}");
             return builder.ToString();
         }
