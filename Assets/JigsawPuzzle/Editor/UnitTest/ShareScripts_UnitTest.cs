@@ -13,6 +13,12 @@ namespace JigsawPuzzle.UnitTest
         public const string MVCShareScriptDirectory = "JigsawPuzzleMVC/JigsawPuzzleMVC/ShareScript";
         public const string UnityShareScriptDirectory = "Assets/JigsawPuzzle/Editor";
 
+        public static readonly List<(string, string)> AssetFilesPath = new List<(string, string)>()
+        {
+            ("JigsawPuzzleMVC/JigsawPuzzleMVC/App_Data/ServerRouteConfig.json", 
+            "Assets/Editor Default Resources/JigsawPuzzle/ServerRouteConfig.json"),
+        };
+
         /* func */
         [MenuItem("Unit Test/" + nameof(ShareScriptAttribute) + "/" + nameof(ShareScriptShouldEqual))]
         public static void ShareScriptShouldEqual()
@@ -30,6 +36,7 @@ namespace JigsawPuzzle.UnitTest
                     scriptFilesPath.Add($"{scriptFileName}.cs");
                 }
             }
+
             foreach (string scriptFilePath in scriptFilesPath)
             {
                 string mvcScriptFilePath = $"{MVCShareScriptDirectory}/{scriptFilePath}";
@@ -47,6 +54,30 @@ namespace JigsawPuzzle.UnitTest
                     string mvcLastWriteTime = new FileInfo(mvcScriptFilePath).LastWriteTime.ToString();
                     string unityLastWriteTime = new FileInfo(unityScriptFilePath).LastWriteTime.ToString();
                     Debug.LogError($"File is not equal, {scriptFilePath}\n MVC : {mvcScriptFileExists} LastWriteTime : {mvcLastWriteTime}, Unity : {unityScriptFileExists} LastWriteTime : {unityLastWriteTime}");
+                    continue;
+                }
+            }
+            Debug.Log("Finish");
+        }
+
+        [MenuItem("Unit Test/" + nameof(ShareScriptAttribute) + "/" + nameof(AssetShouldEqual))]
+        public static void AssetShouldEqual()
+        {
+            foreach ((string, string) filePath in AssetFilesPath)
+            {
+                bool mvcScriptFileExists = File.Exists(filePath.Item1);
+                bool unityScriptFileExists = File.Exists(filePath.Item2);
+                if (!mvcScriptFileExists
+                    || !unityScriptFileExists)
+                {
+                    Debug.LogError($"File not found\n MVC : {mvcScriptFileExists}, {filePath.Item1}\n Unity : {unityScriptFileExists}, {filePath.Item2}");
+                    continue;
+                }
+                else if (!File.ReadAllText(filePath.Item1).Equals(File.ReadAllText(filePath.Item2)))
+                {
+                    string mvcLastWriteTime = new FileInfo(filePath.Item1).LastWriteTime.ToString();
+                    string unityLastWriteTime = new FileInfo(filePath.Item2).LastWriteTime.ToString();
+                    Debug.LogError($"File is not equal\n MVC : {mvcScriptFileExists} LastWriteTime : {mvcLastWriteTime}, {filePath.Item1}\nUnity : {unityScriptFileExists} LastWriteTime : {unityLastWriteTime}, {filePath.Item2}");
                     continue;
                 }
             }

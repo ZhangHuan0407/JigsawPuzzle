@@ -1,0 +1,39 @@
+﻿{
+  "BaseAddress": "http:///127.0.0.1",
+  "ServerRoute": {
+    "Dashboard": {
+      "GetDetailInfo": {
+        "ReturnContent": "JigsawPuzzle.Models.DashboardInfo",
+        "Type": "HttpGet"
+      }
+    },
+    "Explorer": {
+      "GetFileMapJson": {
+        "ReturnType": "System.Collections.Generic.Dictionary<string, string[]>",
+        "Type": "HttpGet"
+      },
+      "SelectFiles": {
+        "ReturnType": "System.String",
+        "Form": {
+          "File": "System.String[]"
+        },
+        "Type": "HttpPost"
+      }
+    },
+    "Task": {
+      "CreateNewData": {
+        "ReturnType": "System.String",
+        "Form": {
+          "Name": "System.String",
+          "InfoData": "JigsawPuzzleInfoData",
+          "BinData": "System.Byte[]"
+        },
+        "Type": "HttpPost"
+      },
+      "StartNew": {
+        "ReturnType": "System.String",
+        "Type": "HttpGet"
+      }
+    }
+  }
+}
