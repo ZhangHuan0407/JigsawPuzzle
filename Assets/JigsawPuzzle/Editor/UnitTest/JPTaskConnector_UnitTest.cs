@@ -21,13 +21,28 @@ namespace JigsawPuzzle.UnitTest
             JigsawPuzzleWindow window = EditorWindow.GetWindow<JigsawPuzzleWindow>();
             window.Connector.Value.Get(
                 "Dashboard", "GetDetailInfo",
-                (HttpResponseMessage message) => 
+                (object obj) => 
                 {
-                    Debug.Log($"Finish Dashboard/GetDetailInfo\n{message}");
-                    string data = message.Content.ReadAsStringAsync().Result;
-                    Debug.Log($"data :\n{data}");
+                    Debug.Log($"Finish Dashboard/GetDetailInfo data :\n{obj}");
                 },
                 (HttpResponseMessage message) => 
+                {
+                    Debug.LogError("Error!");
+                    Debug.Log(message.ToString());
+                });
+        }
+
+        [MenuItem("Unit Test/" + nameof(JPTaskConnector) + "/" + nameof(ExplorerShouldGetFileMapJson))]
+        public static void ExplorerShouldGetFileMapJson()
+        {
+            JigsawPuzzleWindow window = EditorWindow.GetWindow<JigsawPuzzleWindow>();
+            window.Connector.Value.Get(
+                "Explorer", "GetFileMapJson",
+                (object obj) =>
+                {
+                    Debug.Log($"Finish Explorer/GetFileMapJson data :\n{obj}");
+                },
+                (HttpResponseMessage message) =>
                 {
                     Debug.LogError("Error!");
                     Debug.Log(message.ToString());

@@ -1,4 +1,5 @@
-﻿using JigsawPuzzle.Models;
+﻿using JigsawPuzzle.Analysis;
+using JigsawPuzzle.Models;
 using Newtonsoft.Json;
 using System.IO;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace JigsawPuzzle.Controllers
 {
     public class TaskController : Controller
     {
+        [WebAPI]
         [HttpPost]
         public Task<ActionResult> CreateNewData(FormCollection form)
         {
@@ -37,6 +39,7 @@ namespace JigsawPuzzle.Controllers
             });
         }
 
+        [WebAPI]
         [HttpGet]
         public Task<ActionResult> StartNew()
         {

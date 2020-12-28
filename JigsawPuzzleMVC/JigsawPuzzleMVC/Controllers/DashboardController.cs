@@ -1,4 +1,5 @@
-﻿using JigsawPuzzle.Models;
+﻿using JigsawPuzzle.Analysis;
+using JigsawPuzzle.Models;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace JigsawPuzzle.Controllers
             return View(info);
         }
 
+        [WebAPI]
         [HttpGet]
         public Task<ActionResult> GetDetailInfo()
         {

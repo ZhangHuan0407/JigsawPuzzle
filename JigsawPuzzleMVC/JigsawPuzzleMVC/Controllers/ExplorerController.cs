@@ -1,4 +1,5 @@
-﻿using JigsawPuzzle.Models;
+﻿using JigsawPuzzle.Analysis;
+using JigsawPuzzle.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
@@ -20,6 +21,7 @@ namespace JigsawPuzzle.Controllers
                 return View(fileMap) as ActionResult;
             });
         }
+        [WebAPI]
         [HttpGet]
         public Task<ActionResult> GetFileMapJson()
         {
@@ -49,6 +51,7 @@ namespace JigsawPuzzle.Controllers
             return fileMap;
         }
 
+        [WebAPI]
         [HttpPost]
         public Task<ActionResult> SelectFiles(FormCollection form)
         {
