@@ -1,5 +1,5 @@
 ﻿{
-  "BaseAddress": "http://127.0.0.1/",
+  "BaseAddress": "https://localhost:44331/",
   "WebAPI": [
     //DashboardController
     {

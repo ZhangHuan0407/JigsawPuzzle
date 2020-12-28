@@ -33,9 +33,6 @@ namespace JigsawPuzzle
             {
                 JigsawPuzzleAsset.GetNew();
             }
-            if (GUILayout.Button("2"))
-            {
-            }
         }
     }
 }
