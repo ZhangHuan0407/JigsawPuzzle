@@ -1,0 +1,58 @@
+﻿@model JigsawPuzzle.Models.DashboardInfo
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<div>
+    <h4>DashboardInfo</h4>
+    <ul class="list-group">
+        <li class="list-group-item">
+            <div style="width:80%">
+                <h4>PortConfig</h4>
+                <dl class="dl-horizontal">
+                    <dt>
+                        PortName
+                    </dt>
+                    <dd>
+                        @Model.PortConfig.PortName
+                    </dd>
+                    <dt>
+                        DataDirectory
+                    </dt>
+                    <dd>
+                        @Model.PortConfig.DataDirectory
+                    </dd>
+                    <dt>
+                        MaxOfConcurrentTasks
+                    </dt>
+                    <dd>
+                        @Model.PortConfig.MaxOfConcurrentTasks
+                    </dd>
+                    <dt>
+                        MaxOfProcessMemory
+                    </dt>
+                    <dd>
+                        @Model.PortConfig.MaxOfProcessMemory
+                    </dd>
+                    <dt>
+                        ServerIPAddress
+                    </dt>
+                    <dd>
+                        @Model.PortConfig.ServerIPAddress
+                    </dd>
+                    <dt>
+                        ServerIPAddressV6
+                    </dt>
+                    <dd>
+                        @Model.PortConfig.ServerIPAddressV6
+                    </dd>
+                </dl>
+            </div>
+        </li>
+    </ul>
+</div>
+<p>
+</p>

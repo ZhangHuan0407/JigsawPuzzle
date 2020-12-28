@@ -34,6 +34,8 @@
     <DefineConstants>TRACE;DEBUG;MVC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+    <DocumentationFile>bin\JigsawPuzzle.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -163,6 +165,8 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="App_Data\PortConfig.json" />
     <Content Include="App_Data\ServerRouteConfig.json" />
+    <None Include="Properties\PublishProfiles\MVC Debug.pubxml" />
+    <None Include="Properties\PublishProfiles\MVC Release.pubxml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />

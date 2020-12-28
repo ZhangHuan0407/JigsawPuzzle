@@ -1,0 +1,25 @@
+﻿<!--File System / File List-->
+@model JigsawPuzzle.Models.FileList
+
+<div style="border:1px solid #66ffcc">
+    <ul>
+        <li>
+            <div>
+                <label>
+                    <span>@Model.DirectoryName</span>
+                </label>
+            </div>
+        </li>
+        @foreach (var fileName in Model.FilesName)
+        {
+            <li>
+                <div style="padding-left:25px">
+                    <label>
+                        <input type="checkbox" name="File" value="@Model.DirectoryName/@fileName" multiple="@Model.Multiple"/>
+                        <span>@fileName</span>
+                    </label>
+                </div>
+            </li>
+        }
+    </ul>
+</div>
