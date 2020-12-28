@@ -95,6 +95,7 @@ namespace JigsawPuzzle
         public static IEnumerable<string> GetAssetList() => Directory.GetFiles(AssetDirectory, "*.asset");
         public static JigsawPuzzleAsset GetNew()
         {
+            Directory.CreateDirectory(AssetDirectory);
             JigsawPuzzleAsset instance = CreateInstance<JigsawPuzzleAsset>();
             AssetDatabase.CreateAsset(instance, instance.AssetFullName);
             return instance;
