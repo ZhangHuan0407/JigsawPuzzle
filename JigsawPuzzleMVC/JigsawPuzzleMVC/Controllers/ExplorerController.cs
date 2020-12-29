@@ -8,6 +8,11 @@ using System.Web.Mvc;
 
 namespace JigsawPuzzle.Controllers
 {
+    /// <summary>
+    /// <see cref="ExplorerController"/> 负责对接用户文件的浏览，创建，删除，选中操作
+    /// <para>远程进程可以通过 <see cref="GetFileMapJson"/>, <see cref="SelectFiles"/> WebAPI 直接进行资源文件操作</para>
+    /// <para>对于无法执行，已过时或无效的请求，不同操作器行为具有独立的应答规则</para>
+    /// </summary>
     public class ExplorerController : Controller
     {
         /* func */

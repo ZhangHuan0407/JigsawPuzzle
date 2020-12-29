@@ -13,11 +13,29 @@ namespace JigsawPuzzle
     public class ControllerAction
     {
         /* field */
+        /// <summary>
+        /// 行为名称
+        /// </summary>
         public string Action;
+        /// <summary>
+        /// 控制器名称
+        /// </summary>
         public string Controller;
+        /// <summary>
+        /// 请求表单数据项目名称
+        /// </summary>
         public string[] FormKeys;
+        /// <summary>
+        /// 请求表单数据值类型
+        /// </summary>
         public string[] FormValues;
+        /// <summary>
+        /// 返回值类型
+        /// </summary>
         public string ReturnType;
+        /// <summary>
+        /// 请求类型
+        /// </summary>
         public string Type;
 
         /* ctor */

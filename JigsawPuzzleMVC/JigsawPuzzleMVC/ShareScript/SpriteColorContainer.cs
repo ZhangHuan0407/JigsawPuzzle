@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace JigsawPuzzle
 {
+    /// <summary>
+    /// 精灵图片色彩数据的容器，在整个运算任务中保证色彩数据只序列化一次
+    /// </summary>
     [ShareScript]
     public class SpriteColorContainer
     {
@@ -42,6 +45,9 @@ namespace JigsawPuzzle
                 }
             SpriteColorData.Add(spriteInfo, colorData);
         }
+        /// <summary>
+        /// 立即清除所有精灵图片的色彩数据
+        /// </summary>
         public void Clear() => SpriteColorData.Clear();
     }
 }

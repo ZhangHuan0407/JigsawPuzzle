@@ -19,9 +19,18 @@ namespace JigsawPuzzle
         internal readonly Dictionary<string, Dictionary<string, ControllerAction>> ServerRoute;
         public string BaseAddress;
 
+        /// <summary>
+        /// 当前服务器路由配置中全部的控制器行为
+        /// </summary>
         public ControllerAction[] WebAPI;
 
         /* inter */
+        /// <summary>
+        /// 获取目标控制器行为，如果此控制器不存在或行为不存在，将返回 null
+        /// </summary>
+        /// <param name="controller">目标控制器</param>
+        /// <param name="action">目标行为</param>
+        /// <returns>控制器行为数据或 null</returns>
         public ControllerAction this[string controller, string action]
         {
             get 

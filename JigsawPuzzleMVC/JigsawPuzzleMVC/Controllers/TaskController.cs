@@ -7,6 +7,11 @@ using System.Web.Mvc;
 
 namespace JigsawPuzzle.Controllers
 {
+    /// <summary>
+    /// <see cref="TaskController"/> 负责对接执行任务的数据接收，任务递交，任务状态访问，运行结果回传
+    /// <para>此控制器行为大多返回 <see cref="HttpStatusCodeResult"/> 以报告执行结果，有时以重定向作为下一步访问目标。</para>
+    /// <para>对于无法执行，已过时或无效的请求，操作器行为返回 <see cref="HttpStatusCodeResult"/> 以报告执行结果</para>
+    /// </summary>
     public class TaskController : Controller
     {
         [WebAPI]
