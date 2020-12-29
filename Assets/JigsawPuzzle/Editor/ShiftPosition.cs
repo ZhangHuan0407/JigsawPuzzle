@@ -215,7 +215,7 @@ namespace JigsawPuzzle
         {
             if (maxDistance < 1)
                 yield break;
-
+            throw new NotImplementedException();
 
 
 

@@ -1,11 +1,16 @@
 ﻿namespace JigsawPuzzle
 {
+    /// <summary>
+    /// 二维平面整型位置信息
+    /// </summary>
     [ShareScript]
     public struct Point
     {
         /* field */
-        public int X;
-        public int Y;
+        /// <summary>
+        /// 整型分量
+        /// </summary>
+        public int X, Y;
 
         /* ctor */
         public Point(int x, int y)

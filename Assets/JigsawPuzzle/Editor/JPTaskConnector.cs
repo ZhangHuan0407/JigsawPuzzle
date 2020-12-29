@@ -51,7 +51,7 @@ namespace JigsawPuzzle
         /// <summary>
         /// 创建新的 <see cref="JPTaskConnector"/> 实例，承担 JigsawPuzzle 数据传输任务与远程访问
         /// </summary>
-        /// <param name="strUri">发送请求时使用的 Uri 地址</param>
+        /// <param name="serverRouteContent">发送请求时使用的 Uri 地址</param>
         /// <param name="timeoutSeconds">超时时间，默认 5 秒</param>
         public JPTaskConnector(string serverRouteContent, int timeoutSeconds = 5)
         {
@@ -151,6 +151,7 @@ namespace JigsawPuzzle
         /// </summary>
         /// <param name="controller">MVC 公开控制器</param>
         /// <param name="action">MVC 公开 HttpPost 行为</param>
+        /// <param name="data">发送的数据</param>
         /// <param name="success">服务器回复数据，检查通过</param>
         /// <param name="failed">链接中出现错误，或服务器返回执行不通过的状态码</param>
         /// <returns>执行任务</returns>

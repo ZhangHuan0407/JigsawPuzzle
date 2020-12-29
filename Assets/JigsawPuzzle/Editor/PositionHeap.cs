@@ -3,12 +3,19 @@ using System.Collections.Generic;
 
 namespace JigsawPuzzle
 {
+    /// <summary>
+    /// 位置堆
+    /// <para>向位置堆中加入超出容量的位置信息时，仅存储最有利的位置信息</para>
+    /// </summary>
     [ShareScript]
     [Serializable]
     public class PositionHeap
     {
         /* field */
         public LinkedList<(Point, float)> PositionList;
+        /// <summary>
+        /// 位置堆的存储容量
+        /// </summary>
         public readonly int Capacity;
 
         /* inter */

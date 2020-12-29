@@ -1,13 +1,20 @@
 ﻿namespace JigsawPuzzle
 {
+    /// <summary>
+    /// 单个像素的颜色信息
+    /// <para>与 Unity 不同，此数据为引用类型</para>
+    /// </summary>
     [ShareScript]
-    public struct JPColor
+    public class JPColor
     {
         /* const */
         public const int FileDataPreJPColor = 7;
         public const int MemoryDataPreJPColor = 28;
 
         /* field */
+        /// <summary>
+        /// 颜色浮点分量
+        /// </summary>
         public float R, G, B, A, H, S, V;
 
         /* ctor */
@@ -25,12 +32,22 @@
         /* inter */
 
         /* func */
-        public static JPVector3 RGBADelta(JPColor left, JPColor right) =>
-            new JPVector3(
-                (left.R - right.R) * right.A,
-                (left.G - right.G) * right.A,
-                (left.B - right.B) * right.A);
-
-
+        /// <summary>
+        /// 求两个颜色的差值
+        /// </summary>
+        /// <returns>RGBA 视觉下的颜色差值</returns>
+        public static JPVector3 RGBADelta(JPColor one, JPColor another)
+        {
+            float ratio = one.A * another.A;
+            JPVector3 result;
+            if (ratio > 0)
+                result = new JPVector3(
+                    (one.R - another.R) * ratio,
+                    (one.G - another.G) * ratio,
+                    (one.B - another.B) * ratio);
+            else
+                result = JPVector3.Zero;
+            return result;
+        }
     }
 }
