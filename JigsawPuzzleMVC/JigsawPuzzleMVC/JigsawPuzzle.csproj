@@ -119,6 +119,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analysis\Log.cs" />
     <Compile Include="Analysis\WebAPIAttribute.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShareScript\ColorMatch.cs" />
     <Compile Include="ShareScript\ControllerAction.cs" />
+    <Compile Include="ShareScript\HttpContentConverter.cs" />
     <Compile Include="ShareScript\JPRGBAColorMatch.cs" />
     <Compile Include="ShareScript\JPTask.cs" />
     <Compile Include="ShareScript\JPVector3.cs" />

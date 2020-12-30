@@ -1,5 +1,5 @@
 ﻿{
-  "BaseAddress": "http://127.0.0.1/",
+  "BaseAddress": "https://192.168.1.4",
   "WebAPI": [
     {
       "Action": "GetDetailInfo",
@@ -29,11 +29,11 @@
       "Type": "HttpPost"
     },
     {
-      "Action": "CreateNewData",
-      "Controller": "Task",
+      "Action": "UploadFiles",
+      "Controller": "Explorer",
       "DebugOnly": false,
-      "FormKeys": [ "Name", "InfoData", "BinData" ],
-      "FormValues": [ "System.String", "JigsawPuzzleInfoData", "System.Byte[]" ],
+      "FormKeys": [],
+      "FormValues": [],
       "ReturnType": "System.String",
       "Type": "HttpPost"
     },

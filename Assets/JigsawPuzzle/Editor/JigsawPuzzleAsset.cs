@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
 using UnityEditor;
 using UnityEngine;
 
@@ -24,7 +25,9 @@ namespace JigsawPuzzle
 
         /* inter */
         public string AssetFullName => $"{AssetDirectory}/{DataName}.asset";
+        public string InfoDataName => $"{DataName}.json";
         public string InfoDataFullName => $"{AssetDirectory}/{DataName}.json";
+        public string BinDataName => $"{DataName}.bytes";
         public string BinDataFullName => $"{AssetDirectory}/{DataName}.bytes";
 
         /* ctor */
@@ -90,6 +93,23 @@ namespace JigsawPuzzle
             File.Delete($"{InfoDataFullName}.meta");
             File.Delete(BinDataFullName);
             File.Delete($"{BinDataFullName}.meta");
+        }
+
+        public void SendToServer()
+        {
+            byte[] BinData = File.ReadAllBytes(BinDataFullName);
+            JPTaskConnector connector = EditorWindow.GetWindow<JigsawPuzzleWindow>().Connector.Value;
+            connector.PostFile(
+                "Explorer", "UploadFiles",
+                BinData, "File", $"{BinDataName}",
+                (object obj) => Debug.Log($"Task/CreateNewData success.{obj}"),
+                (HttpResponseMessage message) => Debug.LogError($"Task/CreateNewData failed.\n{message.Content.ReadAsStringAsync().Result}"));
+            BinData = File.ReadAllBytes(InfoDataFullName);
+            connector.PostFile(
+                "Explorer", "UploadFiles",
+                BinData, "File", $"{InfoDataName}",
+                (object obj) => Debug.Log($"Task/CreateNewData success.{obj}"),
+                (HttpResponseMessage message) => Debug.LogError($"Task/CreateNewData failed.\n{message.Content.ReadAsStringAsync().Result}"));
         }
 
         public static IEnumerable<string> GetAssetList() => Directory.GetFiles(AssetDirectory, "*.asset");

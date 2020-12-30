@@ -58,7 +58,7 @@ namespace JigsawPuzzle.UnitTest
             JPTaskConnector value = EditorWindow.GetWindow<JigsawPuzzleWindow>().Connector.Value;
 
             HttpClient client = fieldInfo.GetValue(value) as HttpClient;
-            value.Post("Explorer", "SelectFiles", new Dictionary<string, object>
+            value.PostForm("Explorer", "SelectFiles", new Dictionary<string, object>
             {
                 { "File", new string[]{ "11111", "22222", "33333" } },
             }, 

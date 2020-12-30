@@ -23,6 +23,9 @@ namespace JigsawPuzzle
                 AssetDatabase.Refresh();
             }
             EditorGUILayout.Space();
+            if (GUILayout.Button(nameof(JigsawPuzzleAsset.SendToServer)))
+                m_Target.SendToServer();
+            EditorGUILayout.Space();
             if (GUILayout.Button(nameof(JigsawPuzzleAsset.RemoveDataFiles)))
             {
                 m_Target.RemoveDataFiles();

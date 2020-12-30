@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -87,7 +89,7 @@ namespace JigsawPuzzle
         /// <param name="failed">链接中出现错误，或服务器返回执行不通过的状态码</param>
         /// <returns>执行任务</returns>
         public Task Get(string controller, string action,
-            Action<object> success, 
+            Action<object> success,
             Action<HttpResponseMessage> failed = null)
         {
             if (string.IsNullOrWhiteSpace(controller))
@@ -95,14 +97,14 @@ namespace JigsawPuzzle
             if (string.IsNullOrWhiteSpace(action))
                 throw new ArgumentException($"{nameof(action)}Can not be Null or white space", nameof(action));
             ControllerAction controllerAction = ServerRouteConfig[controller, action];
-            
+
             if (controllerAction is null)
                 throw new Exception($"Not found {controller}/{action} in {nameof(ServerRouteConfig)}");
             else if (!controllerAction.Type.Equals("HttpGet"))
                 throw new Exception($"{controller}/{action} type is not equal.");
 
             Task<HttpResponseMessage> responseMessage = Client.GetAsync($"{controller}/{action}");
-            return Task.Run(() => 
+            return Task.Run(() =>
             {
                 try
                 {
@@ -145,7 +147,7 @@ namespace JigsawPuzzle
         /// <param name="success">服务器回复数据，检查通过</param>
         /// <param name="failed">链接中出现错误，或服务器返回执行不通过的状态码</param>
         /// <returns>执行任务</returns>
-        public void Post(string controller, string action,
+        public void PostForm(string controller, string action,
             Dictionary<string, object> data,
             Action<object> success = null,
             Action<HttpResponseMessage> failed = null)
@@ -172,11 +174,27 @@ namespace JigsawPuzzle
                     for (int index = 0; index < controllerAction.FormKeys.Length; index++)
                     {
                         string itemName = controllerAction.FormKeys[index];
-                        if (!data.TryGetValue(itemName, out object obj))
+                        if (!data.TryGetValue(itemName, out object obj)
+                            || obj is null)
                             throw new ArgumentNullException($"{itemName} is null.");
                         string itemType = controllerAction.FormValues[index];
-                        foreach (HttpContent content in HttpContentConverter.ObjectToHttpContent[itemType](obj))
-                            form.Add(content, itemName);
+                        if (HttpContentConverter.ObjectToHttpContent.TryGetValue(itemType, out Func<object, IEnumerable<HttpContent>> converter))
+                        {
+                            foreach (HttpContent content in converter(obj))
+                                form.Add(content, itemName);
+                        }
+                        else if (obj.GetType().GetCustomAttribute<SerializableAttribute>(false) != null
+                            || obj.GetType().GetCustomAttribute<ShareScriptAttribute>(false) != null)
+                        {
+#if UNITY_EDITOR
+                            string content = JsonUtility.ToJson(obj);
+#else
+                            string content = JsonConvert.SerializeObject(obj);
+#endif
+                            form.Add(new StringContent(content), itemName);
+                        }
+                        else
+                            throw new ArgumentNullException($"{itemType} is not defined converter.");
                     }
                     responseMessage = Client.PostAsync($"{controller}/{action}", form);
 
@@ -186,6 +204,65 @@ namespace JigsawPuzzle
                     {
                         resultObject = HttpContentConverter.HttpContentToObject[controllerAction.ReturnType](responseMessage.Result.Content);
                         success?.Invoke(resultObject);
+                        return;
+                    }
+                    else
+                    {
+                        Action<HttpResponseMessage> copy = failed;
+                        failed = null;
+                        copy?.Invoke(responseMessage.Result);
+                    }
+                }
+                catch (Exception e)
+                {
+                    // Log : Controller/Action
+#if UNITY_EDITOR
+                    Debug.LogError($"{e.Message}\n{e.StackTrace}");
+#else
+                    Console.WriteLine($"{e.Message}\n{e.StackTrace}");
+#endif
+                }
+                finally
+                {
+                    failed?.Invoke(responseMessage?.Result);
+                }
+            });
+        }
+        public void PostFile(string controller, string action,
+            byte[] binData, string name, string fileName,
+            Action<object> success = null,
+            Action<HttpResponseMessage> failed = null)
+        {
+            if (string.IsNullOrWhiteSpace(controller))
+                throw new ArgumentException($"{nameof(controller)}Can not be Null or white space", nameof(controller));
+            if (string.IsNullOrWhiteSpace(action))
+                throw new ArgumentException($"{nameof(action)}Can not be Null or white space", nameof(action));
+            if (binData is null)
+                throw new ArgumentNullException(nameof(binData));
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new ArgumentException($"{nameof(fileName)}Can not be Null or white space", nameof(fileName));
+
+            ControllerAction controllerAction = ServerRouteConfig[controller, action];
+            if (controllerAction is null)
+                throw new Exception($"Not found {controller}/{action} in {nameof(ServerRouteConfig)}");
+            else if (!controllerAction.Type.Equals("HttpPost"))
+                throw new Exception($"{controller}/{action} type is not equal.");
+
+            Task.Run(() =>
+            {
+                Task<HttpResponseMessage> responseMessage = null;
+                try
+                {
+                    MultipartFormDataContent form = new MultipartFormDataContent();
+                    form.Add(new ByteArrayContent(binData), name, fileName);
+                    responseMessage = Client.PostAsync($"{controller}/{action}", form);
+                    responseMessage.Wait();
+                    object resultObject = null;
+                    if (responseMessage.Result.IsSuccessStatusCode)
+                    {
+                        resultObject = HttpContentConverter.HttpContentToObject[controllerAction.ReturnType](responseMessage.Result.Content);
+                        success?.Invoke(resultObject);
+                        return;
                     }
                     else
                     {

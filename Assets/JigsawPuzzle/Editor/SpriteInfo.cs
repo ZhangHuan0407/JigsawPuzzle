@@ -48,24 +48,36 @@ namespace JigsawPuzzle
 
         #region  StatisticalData
 #if UNITY_EDITOR
+        [NonSerialized]
         [HideInInspector]
         public int TotalNumberOfPossibilities;
+        [NonSerialized]
         [HideInInspector]
         public ShiftPositionPropensity PretreatmentPropensity;
+        [NonSerialized]
         [HideInInspector]
         public ShiftPositionPropensity Propensity;
+        [NonSerialized]
         [HideInInspector]
         public PositionHeap PreferredPositiosn;
+        [NonSerialized]
         [HideInInspector]
         public float MaxSqrMagnitude;
+        [NonSerialized]
         [HideInInspector]
         public int AccurateDistance;
 #else
+        [NonSerialized]
         public int TotalNumberOfPossibilities;
+        [NonSerialized]
         public ShiftPositionPropensity PretreatmentPropensity;
+        [NonSerialized]
         public ShiftPositionPropensity Propensity;
+        [NonSerialized]
         public PositionHeap PreferredPositiosn;
+        [NonSerialized]
         public float MaxSqrMagnitude;
+        [NonSerialized]
         public int AccurateDistance;
 #endif
         #endregion

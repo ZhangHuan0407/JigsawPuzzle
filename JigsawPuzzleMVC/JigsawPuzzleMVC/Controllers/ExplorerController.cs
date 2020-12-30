@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Mvc;
 
 namespace JigsawPuzzle.Controllers
@@ -85,6 +86,20 @@ namespace JigsawPuzzle.Controllers
                     // Log this exception
                     return new HttpStatusCodeResult(400, "Select Files successful, but Redirect link have argument exception") as ActionResult;
             });
+        }
+
+        [WebAPI]
+        [HttpPost]
+        public ActionResult UploadFiles()
+        {
+            for (int index = 0; index < Request.Files.Count; index++)
+            {
+                HttpPostedFileBase fileBase = Request.Files[index];
+                FileInfo fileInfo = new FileInfo($"{PortConfig.Value.DataDirectory}/{fileBase.FileName}");
+                if (fileInfo.Directory.Exists)
+                    fileBase.SaveAs(fileInfo.FullName);
+            }
+            return Content("UploadFile successful") as ActionResult;
         }
     }
 }
