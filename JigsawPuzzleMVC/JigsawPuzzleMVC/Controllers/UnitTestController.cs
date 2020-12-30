@@ -28,7 +28,9 @@ namespace JigsawPuzzle.Controllers
             typeof(ExplorerController),
             typeof(HomeController),
             typeof(TaskController),
+            typeof(UnitTestController),
         };
+        [WebAPI(DebugOnly = true)]
         [HttpGet]
         public ActionResult RebuildServerRouteConfig()
         {
@@ -38,20 +40,19 @@ namespace JigsawPuzzle.Controllers
             foreach (ControllerAction newInfo in newConfig.WebAPI)
             {
                 ControllerAction oldInfo = oldConfig[newInfo.Controller, newInfo.Action];
-                if (oldInfo is null)
-                    continue;
 
-                if (newInfo.Type == "HttpPost")
-                {
-                    newInfo.FormKeys = oldInfo.FormKeys;
-                    newInfo.FormValues = oldInfo.FormValues;
-                }
-                else
+                if (newInfo.Type == "HttpGet")
                 {
                     newInfo.FormKeys = new string[0];
                     newInfo.FormValues = new string[0];
                 }
-                newInfo.ReturnType = oldInfo.ReturnType;
+                else if (newInfo.Type == "HttpPost")
+                {
+                    newInfo.FormKeys = oldInfo?.FormKeys ?? new string[0];
+                    newInfo.FormValues = oldInfo?.FormValues ?? new string[0];
+                }
+
+                newInfo.ReturnType = oldInfo?.ReturnType ?? string.Empty;
             }
             return Content(JsonConvert.SerializeObject(newConfig));
         }
@@ -65,13 +66,13 @@ namespace JigsawPuzzle.Controllers
         }
         private ServerRouteConfig GetNewServerRouteConfig()
         {
-            List<MethodInfo> WebAPIList = new List<MethodInfo>();
+            List<WebAPIAttribute> WebAPIList = new List<WebAPIAttribute>();
             foreach (Type type in AllControllers)
                 WebAPIList.AddRange(WebAPIAttribute.GetWebAPI(type));
 
             List<ControllerAction> newWebAPIList = new List<ControllerAction>();
-            foreach (MethodInfo methodInfo in WebAPIList)
-                newWebAPIList.Add(new ControllerAction(methodInfo));
+            foreach (WebAPIAttribute webAPI in WebAPIList)
+                newWebAPIList.Add(new ControllerAction(webAPI));
             ServerRouteConfig newConfig = new ServerRouteConfig
             {
                 WebAPI = newWebAPIList.ToArray(),
@@ -79,7 +80,6 @@ namespace JigsawPuzzle.Controllers
             };
             return newConfig;
         }
-
     }
 }
 #endif

@@ -1,50 +1,59 @@
 ﻿{
-  "BaseAddress": "https://localhost:44331/",
+  "BaseAddress": "http://127.0.0.1/",
   "WebAPI": [
-    //DashboardController
     {
       "Action": "GetDetailInfo",
       "Controller": "Dashboard",
+      "DebugOnly": false,
       "FormKeys": [],
       "FormValues": [],
       "ReturnType": "JigsawPuzzle.Models.DashboardInfo",
       "Type": "HttpGet"
     },
-
-    //ExplorerController
     {
       "Action": "GetFileMapJson",
       "Controller": "Explorer",
+      "DebugOnly": false,
       "FormKeys": [],
       "FormValues": [],
-      "ReturnType": "System.Collections.Generic.Dictionary<string, string[]>",
+      "ReturnType": "System.Collections.Generic.Dictionary",
       "Type": "HttpGet"
     },
     {
       "Action": "SelectFiles",
       "Controller": "Explorer",
+      "DebugOnly": false,
       "FormKeys": [ "File" ],
       "FormValues": [ "System.String[]" ],
       "ReturnType": "System.String",
       "Type": "HttpPost"
     },
-
-    //TaskController
+    {
+      "Action": "CreateNewData",
+      "Controller": "Task",
+      "DebugOnly": false,
+      "FormKeys": [ "Name", "InfoData", "BinData" ],
+      "FormValues": [ "System.String", "JigsawPuzzleInfoData", "System.Byte[]" ],
+      "ReturnType": "System.String",
+      "Type": "HttpPost"
+    },
     {
       "Action": "StartNew",
       "Controller": "Task",
+      "DebugOnly": false,
       "FormKeys": [],
       "FormValues": [],
       "ReturnType": "System.String",
       "Type": "HttpGet"
     },
     {
-      "Action": "CreateNewData",
-      "Controller": "Task",
-      "FormKeys": [ "Name", "InfoData", "BinData" ],
-      "FormValues": [ "System.String", "JigsawPuzzleInfoData", "System.Byte[]" ],
-      "ReturnType": "System.String",
-      "Type": "HttpPost"
+      "Action": "RebuildServerRouteConfig",
+      "Controller": "UnitTest",
+      "DebugOnly": true,
+      "FormKeys": [],
+      "FormValues": [],
+      "ReturnType": "",
+      "Type": "HttpGet"
     }
   ]
 }

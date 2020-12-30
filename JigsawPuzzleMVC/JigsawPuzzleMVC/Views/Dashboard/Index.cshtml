@@ -38,16 +38,29 @@
                         @Model.PortConfig.MaxOfProcessMemory
                     </dd>
                     <dt>
-                        ServerIPAddress
+                        ServerIPAddressV4
                     </dt>
                     <dd>
-                        @Model.PortConfig.ServerIPAddress
+                        @Model.PortConfig.ServerIPAddressV4
                     </dd>
                     <dt>
                         ServerIPAddressV6
                     </dt>
                     <dd>
                         @Model.PortConfig.ServerIPAddressV6
+                    </dd>
+                </dl>
+            </div>
+        </li>
+        <li class="list-group-item">
+            <div style="width:80%">
+                <h4></h4>
+                <dl class="dl-horizontal">
+                    <dt>
+                        DebugMode
+                    </dt>
+                    <dd>
+                        @Model.DebugMode
                     </dd>
                 </dl>
             </div>
