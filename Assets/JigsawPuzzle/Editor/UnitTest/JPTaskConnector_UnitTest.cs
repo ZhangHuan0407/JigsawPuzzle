@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -48,5 +50,20 @@ namespace JigsawPuzzle.UnitTest
                     Debug.Log(message.ToString());
                 });
         }
+
+        [MenuItem("Unit Test/" + nameof(JPTaskConnector) + "/" + nameof(ExplorerShouldSelectFiles))]
+        public static void ExplorerShouldSelectFiles()
+        {
+            FieldInfo fieldInfo = typeof(JPTaskConnector).GetField("Client", BindingFlags.NonPublic | BindingFlags.Instance);
+            JPTaskConnector value = EditorWindow.GetWindow<JigsawPuzzleWindow>().Connector.Value;
+
+            HttpClient client = fieldInfo.GetValue(value) as HttpClient;
+            value.Post("Explorer", "SelectFiles", new Dictionary<string, object>
+            {
+                { "File", new string[]{ "11111", "22222", "33333" } },
+            }, 
+            (object result) => { Debug.Log(result); });
+        }
+
     }
 }

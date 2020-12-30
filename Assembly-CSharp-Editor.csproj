@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Assets\JigsawPuzzle\Editor\ColorMatch.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\ControllerAction.cs" />
+    <Compile Include="Assets\JigsawPuzzle\Editor\HttpContentConverter.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\JPColor.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\JPRGBAColorMatch.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\JPTask.cs" />

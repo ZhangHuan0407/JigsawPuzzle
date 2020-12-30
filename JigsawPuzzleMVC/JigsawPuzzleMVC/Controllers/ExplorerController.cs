@@ -72,11 +72,13 @@ namespace JigsawPuzzle.Controllers
                         && fileInfo.FullName.StartsWith(dataDirectory))
                         fileInfos.Add(fileInfo);
                 }
-                Session[nameof(FileInfo)] = fileInfos.ToArray();
+
+                FileInfo[] selectedFileInfos = fileInfos.ToArray();
+                Session[nameof(FileInfo)] = selectedFileInfos;
                 string[] redirectAction = Session[nameof(Redirect)] as string[];
                 Session[nameof(Redirect)] = null;
                 if (redirectAction is null)
-                    return Content("Select Files successful") as ActionResult;
+                    return Content($"Select Files successful, selected files :{selectedFileInfos.Length}") as ActionResult;
                 else if (redirectAction.Length == 2)
                     return RedirectToAction(redirectAction[0], redirectAction[1]) as ActionResult;
                 else

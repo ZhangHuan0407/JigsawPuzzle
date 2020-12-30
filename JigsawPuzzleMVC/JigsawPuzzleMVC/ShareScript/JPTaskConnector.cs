@@ -37,16 +37,6 @@ namespace JigsawPuzzle
         internal readonly ServerRouteConfig ServerRouteConfig;
         private readonly HttpClient Client;
 
-        private static readonly Dictionary<string, Func<object, HttpContent>> ObjectToHttpContent = new Dictionary<string, Func<object, HttpContent>>()
-        {
-            { "System.String", StringToContent },
-        };
-
-        private static readonly Dictionary<string, Func<HttpContent, object>> HttpContentToObject = new Dictionary<string, Func<HttpContent, object>>()
-        {
-            { "System.String", ContentToString },
-        };
-
         /* ctor */
         /// <summary>
         /// 创建新的 <see cref="JPTaskConnector"/> 实例，承担 JigsawPuzzle 数据传输任务与远程访问
@@ -120,7 +110,7 @@ namespace JigsawPuzzle
                     object resultObject = null;
                     if (responseMessage.Result.IsSuccessStatusCode)
                     {
-                        resultObject = HttpContentToObject[controllerAction.ReturnType](responseMessage.Result.Content);
+                        resultObject = HttpContentConverter.HttpContentToObject[controllerAction.ReturnType](responseMessage.Result.Content);
                         success?.Invoke(resultObject);
                     }
                     else
@@ -185,7 +175,8 @@ namespace JigsawPuzzle
                         if (!data.TryGetValue(itemName, out object obj))
                             throw new ArgumentNullException($"{itemName} is null.");
                         string itemType = controllerAction.FormValues[index];
-                        form.Add(ObjectToHttpContent[itemType](obj), itemName);
+                        foreach (HttpContent content in HttpContentConverter.ObjectToHttpContent[itemType](obj))
+                            form.Add(content, itemName);
                     }
                     responseMessage = Client.PostAsync($"{controller}/{action}", form);
 
@@ -193,7 +184,7 @@ namespace JigsawPuzzle
                     object resultObject = null;
                     if (responseMessage.Result.IsSuccessStatusCode)
                     {
-                        resultObject = HttpContentToObject[controllerAction.ReturnType](responseMessage.Result.Content);
+                        resultObject = HttpContentConverter.HttpContentToObject[controllerAction.ReturnType](responseMessage.Result.Content);
                         success?.Invoke(resultObject);
                     }
                     else
@@ -217,21 +208,6 @@ namespace JigsawPuzzle
                     failed?.Invoke(responseMessage?.Result);
                 }
             });
-        }
-
-        private static HttpContent StringToContent(object obj)
-        {
-            if (obj is string str)
-                return new StringContent(str);
-            else
-                throw new ArgumentException($"Argument type error, {nameof(obj)} :{obj?.GetType().FullName}");
-        }
-        private static object ContentToString(HttpContent httpContent)
-        {
-            if (httpContent is StringContent stringContent)
-                return stringContent.ReadAsStringAsync().Result;
-            else
-                throw new ArgumentException($"Argument type error, {nameof(httpContent)} :{httpContent?.GetType().FullName}");
         }
 
         /* IEnumerable */
