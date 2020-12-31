@@ -1,7 +1,6 @@
 using JigsawPuzzle.Analysis;
 using JigsawPuzzle.Models;
 using System;
-using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
@@ -11,6 +10,9 @@ namespace JigsawPuzzleMVC
 {
     public class MvcApplication : HttpApplication
     {
+        /// <summary>
+        /// 网站启动事件
+        /// </summary>
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
@@ -22,6 +24,9 @@ namespace JigsawPuzzleMVC
             Application.Add(nameof(Log), Log.CreateAppLog());
         }
 
+        /// <summary>
+        /// 网站错误处理
+        /// </summary>
         protected void Application_Error(object sender, EventArgs e)
         {
             Exception exception = Server.GetLastError().GetBaseException();
@@ -39,11 +44,17 @@ namespace JigsawPuzzleMVC
             }
         }
 
+        /// <summary>
+        /// 会话开启事件
+        /// </summary>
         protected void Session_Start(object sender, EventArgs e)
         {
             Log log = Application[nameof(Log)] as Log;
             log.WriteData(Session, $"Session_Start\nUserHostAddress : {Request.UserHostAddress}\nUserAgent : {Request.UserAgent}\nUserHostName : {Request.UserHostName}");
         }
+        /// <summary>
+        /// 会话结束事件
+        /// </summary>
         protected void Session_End(object sender, EventArgs e)
         {
             Log log = Application[nameof(Log)] as Log;

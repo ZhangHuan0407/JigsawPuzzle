@@ -14,38 +14,6 @@ namespace JigsawPuzzle.Controllers
     /// </summary>
     public class TaskController : Controller
     {
-        //[WebAPI]
-        //[HttpPost]
-        // [ValidateInput(false)]
-        //public Task<ActionResult> CreateNewData(FormCollection form)
-        //{
-        //    return Task.Run(() => 
-        //    {
-        //        string dataName = form["Name"];
-        //        // 用正则表达式，阻止乱七八糟的命名
-        //        if (string.IsNullOrWhiteSpace(dataName)
-        //            || dataName.Contains("."))
-        //            return new HttpStatusCodeResult(412, "Name not found") as ActionResult;
-
-        //        string infoData = form["InfoData"];
-        //        if (string.IsNullOrWhiteSpace(infoData))
-        //            return new HttpStatusCodeResult(412, "InfoData not found") as ActionResult;
-        //        JigsawPuzzleInfoData jPInfoData = JsonConvert.DeserializeObject<JigsawPuzzleInfoData>(infoData);
-
-        //        byte[] binData = form.GetValue("BinData").ConvertTo(typeof(byte[])) as byte[];
-        //        if (binData is null)
-        //            return new HttpStatusCodeResult(412, "BinData not found") as ActionResult;
-        //        else if (binData.Length != jPInfoData.BinDataLength)
-        //            return new HttpStatusCodeResult(412, "BinData.Length is not equal than InfoData.BinDataLength") as ActionResult;
-        //        // 序列化版本已不再支持
-
-        //        System.IO.File.WriteAllText($"{jPInfoData.DataName}.json", infoData);
-        //        System.IO.File.WriteAllBytes($"{jPInfoData.DataName}.bytes", binData);
-
-        //        return new HttpStatusCodeResult(200, "Create New Data successful") as ActionResult;
-        //    });
-        //}
-
         [WebAPI]
         [HttpGet]
         public Task<ActionResult> StartNew()

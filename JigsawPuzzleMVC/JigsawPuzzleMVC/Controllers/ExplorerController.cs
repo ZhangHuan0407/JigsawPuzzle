@@ -57,6 +57,13 @@ namespace JigsawPuzzle.Controllers
             return fileMap;
         }
 
+        /// <summary>
+        /// 选中复数个用户数据文件夹内的文件
+        /// <para>如果有预留的重定向目标，将立即重定向</para>
+        /// <para>选中0个有效文件，将被认为选择成功</para>
+        /// </summary>
+        /// <param name="form">包含所有选中文件的表单</param>
+        /// <returns>执行结果</returns>
         [WebAPI]
         [HttpPost]
         public Task<ActionResult> SelectFiles(FormCollection form)
@@ -64,6 +71,8 @@ namespace JigsawPuzzle.Controllers
             return Task.Run(() =>
             {
                 string[] files = form.GetValues(nameof(System.IO.File));
+                if (files is null)
+                    return new HttpStatusCodeResult(400, $"Select Files 0?");
                 List<FileInfo> fileInfos = new List<FileInfo>();
                 string dataDirectory = PortConfig.Value.DataDirectory;
                 foreach (string filePath in files)
@@ -90,16 +99,19 @@ namespace JigsawPuzzle.Controllers
 
         [WebAPI]
         [HttpPost]
-        public ActionResult UploadFiles()
+        public Task<ActionResult> UploadFiles()
         {
-            for (int index = 0; index < Request.Files.Count; index++)
+            return Task.Run(() => 
             {
-                HttpPostedFileBase fileBase = Request.Files[index];
-                FileInfo fileInfo = new FileInfo($"{PortConfig.Value.DataDirectory}/{fileBase.FileName}");
-                if (fileInfo.Directory.Exists)
-                    fileBase.SaveAs(fileInfo.FullName);
-            }
-            return Content("UploadFile successful") as ActionResult;
+                for (int index = 0; index < Request.Files.Count; index++)
+                {
+                    HttpPostedFileBase fileBase = Request.Files[index];
+                    FileInfo fileInfo = new FileInfo($"{PortConfig.Value.DataDirectory}/{fileBase.FileName}");
+                    if (fileInfo.Directory.Exists)
+                        fileBase.SaveAs(fileInfo.FullName);
+                }
+                return Content("UploadFile successful") as ActionResult;
+            });
         }
     }
 }
