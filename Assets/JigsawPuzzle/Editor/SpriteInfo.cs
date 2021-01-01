@@ -59,7 +59,7 @@ namespace JigsawPuzzle
         public ShiftPositionPropensity Propensity;
         [NonSerialized]
         [HideInInspector]
-        public PositionHeap PreferredPositiosn;
+        public MinValuePointHeap PreferredPositiosn;
         [NonSerialized]
         [HideInInspector]
         public float MaxSqrMagnitude;
@@ -74,7 +74,7 @@ namespace JigsawPuzzle
         [NonSerialized]
         public ShiftPositionPropensity Propensity;
         [NonSerialized]
-        public PositionHeap PreferredPositiosn;
+        public MinValuePointHeap PreferredPositiosn;
         [NonSerialized]
         public float MaxSqrMagnitude;
         [NonSerialized]
@@ -83,7 +83,7 @@ namespace JigsawPuzzle
         #endregion
 
         /* inter */
-        public long ColorDataLength => JPColor.FileDataPreJPColor * Width * Height;
+        public long ColorDataLength => JPColor.PreJPColorDataSize * Width * Height;
         /// <summary>
         /// 精灵图片的像素数量
         /// </summary>

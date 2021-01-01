@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Text;
 
 #if DEBUG && MVC
@@ -9,6 +10,9 @@ using JigsawPuzzle.Analysis;
 
 namespace JigsawPuzzle
 {
+    /// <summary>
+    /// 控制器行为代表一个服务器可访问调用
+    /// </summary>
     [ShareScript]
     [Serializable]
     public class ControllerAction
@@ -60,15 +64,32 @@ namespace JigsawPuzzle
                 Type = "Error";
         }
 #endif
+        
+        /* func */
+        public Type GetSerializedReturnType()
+        {
+            Type returnType = Assembly.GetExecutingAssembly().GetType(ReturnType, false);
+            if (returnType is null
+                || returnType.GetCustomAttribute<SerializableAttribute>(false) != null
+                || returnType.GetCustomAttribute<ShareScriptAttribute>(false) != null)
+                return null;
+            else
+                return returnType;
+        }
 
         /* operator */
+        /// <summary>
+        /// 获取控制器路由的摘要信息
+        /// </summary>
+        /// <returns>摘要信息</returns>
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder()
                 .AppendLine($"{nameof(Action)} : {Action}")
                 .AppendLine($"{nameof(Controller)} : {Controller}")
-                .AppendLine($"{nameof(FormKeys)} : {FormKeys} {FormKeys.Length}")
-                .AppendLine($"{nameof(FormValues)} : {FormValues} {FormValues.Length}")
+                .AppendLine($"{nameof(DebugOnly)} : {DebugOnly}")
+                .AppendLine($"{nameof(FormKeys)} : {FormKeys} {FormKeys?.Length}")
+                .AppendLine($"{nameof(FormValues)} : {FormValues} {FormValues?.Length}")
                 .AppendLine($"{nameof(ReturnType)} : {ReturnType}")
                 .AppendLine($"{nameof(Type)} : {Type}");
             return builder.ToString();

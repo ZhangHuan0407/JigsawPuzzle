@@ -66,11 +66,7 @@ namespace JigsawPuzzle
         {
             // check
             string infoData = File.ReadAllText(InfoDataFile.FullName);
-#if UNITY_EDITOR
-            JPInfoData = JsonUtility.FromJson<JigsawPuzzleInfoData>(infoData);
-#else
-            JPInfoData = JsonConvert.DeserializeObject<JigsawPuzzleInfoData>(infoData);
-#endif
+            JPInfoData = JsonFuck.FromJsonToObject<JigsawPuzzleInfoData>(infoData);
             byte[] binData = File.ReadAllBytes(BinDataFile.FullName);
 
             if (binData.Length != JPInfoData.BinDataLength)
@@ -106,28 +102,28 @@ namespace JigsawPuzzle
                     spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Random256;
                     spriteInfo.Propensity = ShiftPositionPropensity.Interval9;
                     spriteInfo.AccurateDistance = 4;
-                    spriteInfo.PreferredPositiosn = new PositionHeap(10);
+                    spriteInfo.PreferredPositiosn = new MinValuePointHeap(10);
                 }
                 else if (times > 450000)
                 {
                     spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Random64;
                     spriteInfo.Propensity = ShiftPositionPropensity.Interval9;
                     spriteInfo.AccurateDistance = 4;
-                    spriteInfo.PreferredPositiosn = new PositionHeap(6);
+                    spriteInfo.PreferredPositiosn = new MinValuePointHeap(6);
                 }
                 else if (times > 100000)
                 {
                     spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Random16;
                     spriteInfo.Propensity = ShiftPositionPropensity.Interval3;
                     spriteInfo.AccurateDistance = 1;
-                    spriteInfo.PreferredPositiosn = new PositionHeap(4);
+                    spriteInfo.PreferredPositiosn = new MinValuePointHeap(4);
                 }
                 else
                 {
                     spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.None;
                     spriteInfo.Propensity = ShiftPositionPropensity.Interval3;
                     spriteInfo.AccurateDistance = 1;
-                    spriteInfo.PreferredPositiosn = new PositionHeap(2);
+                    spriteInfo.PreferredPositiosn = new MinValuePointHeap(2);
                 }
             }
 
@@ -205,11 +201,7 @@ namespace JigsawPuzzle
         private void WriteOutResult()
         {
             JPInfoData.UpdateTime();
-#if UNITY_EDITOR
-            string contents = JsonUtility.ToJson(JPInfoData);
-#else
-            string contents = JsonConvert.SerializeObject(JPInfoData);
-#endif
+            string contents = JsonFuck.FromObjectToJson(JPInfoData);
             File.WriteAllText(InfoDataFile.FullName, contents);
         }
     }

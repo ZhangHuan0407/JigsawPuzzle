@@ -113,5 +113,26 @@ namespace JigsawPuzzle.Controllers
                 return Content("UploadFile successful") as ActionResult;
             });
         }
+        [WebAPI]
+        [HttpPost]
+        public Task<ActionResult> DownloadFile()
+        {
+            return Task.Run(() => 
+            {
+                FileInfo[] selectedFileInfos = Session[nameof(FileInfo)] as FileInfo[];
+                if (selectedFileInfos is null)
+                {
+                    Session[nameof(Redirect)] = new string[] { nameof(DownloadFile), "Explorer" };
+                    return RedirectToAction(nameof(FileMap)) as ActionResult;
+                }
+                else if (selectedFileInfos.Length == 0)
+                    return new HttpStatusCodeResult(400, $"Select Files 0?") as ActionResult;
+
+                FileInfo selectedFile = selectedFileInfos[0];
+                if (!System.IO.File.Exists(selectedFile.FullName))
+                    return new HttpStatusCodeResult(400, $"Files Not Exists.{selectedFile.Name}") as ActionResult;
+                return File(System.IO.File.ReadAllBytes(selectedFile.FullName), "application/octet-stream");
+            });
+        }
     }
 }

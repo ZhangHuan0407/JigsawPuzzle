@@ -38,6 +38,7 @@ namespace JigsawPuzzle
         /* field */
         internal readonly ServerRouteConfig ServerRouteConfig;
         private readonly HttpClient Client;
+        internal readonly string UserName;
 
         /* ctor */
         /// <summary>
@@ -50,26 +51,7 @@ namespace JigsawPuzzle
             if (string.IsNullOrWhiteSpace(serverRouteContent))
                 throw new ArgumentException($"“{nameof(serverRouteContent)}”不能为 Null 或空白", nameof(serverRouteContent));
 
-#if UNITY_EDITOR
-            // Bugnity 读 json 数据的时候，如果有注释居然会报错 JSON parse error: Invalid value??
-            // Unity 这么大公司，你们的模板数据里面一行注释都没有??
-            // 你们代码可读性有0分吗?
-            // 目前支持单行注释
-            StringBuilder builder = new StringBuilder();
-            foreach (string line in serverRouteContent.Split('\n'))
-            {
-                if (line.TrimStart().StartsWith("//"))
-                    continue;
-                else
-                    builder.AppendLine(line);
-            }
-            serverRouteContent = builder.ToString();
-            ServerRouteConfig = JsonUtility.FromJson<ServerRouteConfig>(serverRouteContent);
-            // OnAfterDeserialize Invoke by unity
-#else
-            ServerRouteConfig = JsonConvert.DeserializeObject<ServerRouteConfig>(serverRouteContent);
-            ServerRouteConfig.OnAfterDeserialize();
-#endif
+            ServerRouteConfig = JsonFuck.FromJsonToObject<ServerRouteConfig>(serverRouteContent);
 
             Client = new HttpClient()
             {
@@ -77,8 +59,11 @@ namespace JigsawPuzzle
                 MaxResponseContentBufferSize = 20 * 1024 * 1024,
                 Timeout = TimeSpan.FromSeconds(timeoutSeconds),
             };
+
+            UserName = Dns.GetHostName();
         }
 
+        /* func */
         /// <summary>
         /// 发送一个受到监视的 Get 请求，如果传输的数据格式不正确，不会执行回掉
         /// <para>如果需要一个明确的任务结束标记，可以等待返回任务结束</para>
@@ -92,16 +77,7 @@ namespace JigsawPuzzle
             Action<object> success,
             Action<HttpResponseMessage> failed = null)
         {
-            if (string.IsNullOrWhiteSpace(controller))
-                throw new ArgumentException($"{nameof(controller)}Can not be Null or white space", nameof(controller));
-            if (string.IsNullOrWhiteSpace(action))
-                throw new ArgumentException($"{nameof(action)}Can not be Null or white space", nameof(action));
-            ControllerAction controllerAction = ServerRouteConfig[controller, action];
-
-            if (controllerAction is null)
-                throw new Exception($"Not found {controller}/{action} in {nameof(ServerRouteConfig)}");
-            else if (!controllerAction.Type.Equals("HttpGet"))
-                throw new Exception($"{controller}/{action} type is not equal.");
+            ControllerAction controllerAction = ServerRouteConfig.GetControllerAction(controller, action, "HttpGet");
 
             Task<HttpResponseMessage> responseMessage = Client.GetAsync($"{controller}/{action}");
             return Task.Run(() =>
@@ -110,17 +86,33 @@ namespace JigsawPuzzle
                 {
                     responseMessage.Wait();
                     object resultObject = null;
-                    if (responseMessage.Result.IsSuccessStatusCode)
-                    {
-                        resultObject = HttpContentConverter.HttpContentToObject[controllerAction.ReturnType](responseMessage.Result.Content);
-                        success?.Invoke(resultObject);
-                    }
-                    else
+                    if (!responseMessage.Result.IsSuccessStatusCode)
                     {
                         Action<HttpResponseMessage> copy = failed;
                         failed = null;
                         copy?.Invoke(responseMessage.Result);
+                        goto AfterCallback;
                     }
+                    else if (HttpContentConverter.HttpContentToObject.TryGetValue(controllerAction.ReturnType, out Func<HttpContent, object> converter))
+                    {
+                        resultObject = converter(responseMessage.Result.Content);
+                        goto BeforeCallback;
+                    }
+
+                    Type returnType = controllerAction.GetSerializedReturnType();
+                    if (returnType == null)
+                        throw new ArgumentNullException($"{controllerAction.ReturnType} is not defined converter.");
+                    else
+                    {
+                        string jsonResult = responseMessage.Result.Content.ReadAsStringAsync().Result;
+                        resultObject = JsonFuck.FromJsonToObject(jsonResult, returnType);
+                        goto BeforeCallback;
+                    }
+
+                BeforeCallback:
+                    success?.Invoke(resultObject);
+                AfterCallback:
+                    failed = null;
                 }
                 catch (Exception e)
                 {
@@ -152,18 +144,9 @@ namespace JigsawPuzzle
             Action<object> success = null,
             Action<HttpResponseMessage> failed = null)
         {
-            if (string.IsNullOrWhiteSpace(controller))
-                throw new ArgumentException($"{nameof(controller)}Can not be Null or white space", nameof(controller));
-            if (string.IsNullOrWhiteSpace(action))
-                throw new ArgumentException($"{nameof(action)}Can not be Null or white space", nameof(action));
+            ControllerAction controllerAction = ServerRouteConfig.GetControllerAction(controller, action, "HttpPost");
             if (data is null)
                 throw new ArgumentNullException(nameof(data));
-
-            ControllerAction controllerAction = ServerRouteConfig[controller, action];
-            if (controllerAction is null)
-                throw new Exception($"Not found {controller}/{action} in {nameof(ServerRouteConfig)}");
-            else if (!controllerAction.Type.Equals("HttpPost"))
-                throw new Exception($"{controller}/{action} type is not equal.");
 
             Task.Run(() =>
             {
@@ -182,36 +165,52 @@ namespace JigsawPuzzle
                         {
                             foreach (HttpContent content in converter(obj))
                                 form.Add(content, itemName);
+                            goto PostMessage;
                         }
-                        else if (obj.GetType().GetCustomAttribute<SerializableAttribute>(false) != null
-                            || obj.GetType().GetCustomAttribute<ShareScriptAttribute>(false) != null)
+
+                        Type objType = obj.GetType();
+                        if (objType.GetCustomAttribute<SerializableAttribute>(false) != null
+                            || objType.GetCustomAttribute<ShareScriptAttribute>(false) != null)
                         {
-#if UNITY_EDITOR
-                            string content = JsonUtility.ToJson(obj);
-#else
-                            string content = JsonConvert.SerializeObject(obj);
-#endif
+                            string content = JsonFuck.FromObjectToJson(obj);
                             form.Add(new StringContent(content), itemName);
+                            goto PostMessage;
                         }
                         else
                             throw new ArgumentNullException($"{itemType} is not defined converter.");
                     }
+                PostMessage:
                     responseMessage = Client.PostAsync($"{controller}/{action}", form);
 
                     responseMessage.Wait();
                     object resultObject = null;
-                    if (responseMessage.Result.IsSuccessStatusCode)
-                    {
-                        resultObject = HttpContentConverter.HttpContentToObject[controllerAction.ReturnType](responseMessage.Result.Content);
-                        success?.Invoke(resultObject);
-                        return;
-                    }
-                    else
+                    if (!responseMessage.Result.IsSuccessStatusCode)
                     {
                         Action<HttpResponseMessage> copy = failed;
                         failed = null;
                         copy?.Invoke(responseMessage.Result);
+                        goto AfterCallback;
                     }
+                    else if (HttpContentConverter.HttpContentToObject.TryGetValue(controllerAction.ReturnType, out Func<HttpContent, object> converter))
+                    {
+                        resultObject = converter(responseMessage.Result.Content);
+                        goto BeforeCallback;
+                    }
+
+                    Type returnType = controllerAction.GetSerializedReturnType();
+                    if (returnType == null)
+                        throw new ArgumentNullException($"{controllerAction.ReturnType} is not defined converter.");
+                    else
+                    {
+                        string jsonResult = responseMessage.Result.Content.ReadAsStringAsync().Result;
+                        resultObject = JsonFuck.FromJsonToObject(jsonResult, returnType);
+                        goto BeforeCallback;
+                    }
+
+                BeforeCallback:
+                    success?.Invoke(resultObject);
+                AfterCallback:
+                    failed = null;
                 }
                 catch (Exception e)
                 {
@@ -233,28 +232,21 @@ namespace JigsawPuzzle
             Action<object> success = null,
             Action<HttpResponseMessage> failed = null)
         {
-            if (string.IsNullOrWhiteSpace(controller))
-                throw new ArgumentException($"{nameof(controller)}Can not be Null or white space", nameof(controller));
-            if (string.IsNullOrWhiteSpace(action))
-                throw new ArgumentException($"{nameof(action)}Can not be Null or white space", nameof(action));
+            ControllerAction controllerAction = ServerRouteConfig.GetControllerAction(controller, action, "HttpPost");
             if (binData is null)
                 throw new ArgumentNullException(nameof(binData));
             if (string.IsNullOrWhiteSpace(fileName))
                 throw new ArgumentException($"{nameof(fileName)}Can not be Null or white space", nameof(fileName));
-
-            ControllerAction controllerAction = ServerRouteConfig[controller, action];
-            if (controllerAction is null)
-                throw new Exception($"Not found {controller}/{action} in {nameof(ServerRouteConfig)}");
-            else if (!controllerAction.Type.Equals("HttpPost"))
-                throw new Exception($"{controller}/{action} type is not equal.");
 
             Task.Run(() =>
             {
                 Task<HttpResponseMessage> responseMessage = null;
                 try
                 {
-                    MultipartFormDataContent form = new MultipartFormDataContent();
-                    form.Add(new ByteArrayContent(binData), name, fileName);
+                    MultipartFormDataContent form = new MultipartFormDataContent
+                    {
+                        { new ByteArrayContent(binData), name, fileName }
+                    };
                     responseMessage = Client.PostAsync($"{controller}/{action}", form);
                     responseMessage.Wait();
                     object resultObject = null;

@@ -9,11 +9,7 @@ namespace JigsawPuzzle
 {
     [ShareScript]
     [Serializable]
-#if UNITY_EDITOR
     public class ServerRouteConfig : ISerializationCallbackReceiver
-#else
-    public class ServerRouteConfig
-#endif
     {
         /* field */
         internal readonly Dictionary<string, Dictionary<string, ControllerAction>> ServerRoute;
@@ -43,12 +39,30 @@ namespace JigsawPuzzle
             }
         }
 
-        internal Uri BaseAddressUri => new Uri(BaseAddress);
+        internal Uri BaseAddressUri => new Uri($"https://{BaseAddress}");
 
         /* ctor */
         public ServerRouteConfig()
         {
             ServerRoute = new Dictionary<string, Dictionary<string, ControllerAction>>();
+        }
+
+        /* func */
+        public ControllerAction GetControllerAction(string controller, string action, string type)
+        {
+            if (string.IsNullOrWhiteSpace(controller))
+                throw new ArgumentException($"{nameof(controller)}Can not be Null or white space", nameof(controller));
+            if (string.IsNullOrWhiteSpace(action))
+                throw new ArgumentException($"{nameof(action)}Can not be Null or white space", nameof(action));
+            if (string.IsNullOrWhiteSpace(type))
+                throw new ArgumentException($"{nameof(type)}Can not be Null or white space", nameof(action));
+
+            ControllerAction controllerAction = this[controller, action];
+            if (controllerAction is null)
+                throw new Exception($"Not found {controller}/{action} in {nameof(ServerRouteConfig)}");
+            else if (!controllerAction.Type.Equals(type))
+                throw new Exception($"{controller}/{action} type is not equal.");
+            return controllerAction;
         }
 
         /* ISerializationCallbackReceiver */

@@ -20,6 +20,9 @@
         public float X, Y, Z;
 
         /* inter */
+        /// <summary>
+        /// 三维浮点数向量的平方模量
+        /// </summary>
         public float SqrMagnitude => X * X + Y * Y + Z * Z;
 
         /* ctor */

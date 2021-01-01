@@ -8,7 +8,13 @@
     public class JPColor
     {
         /* const */
-        public const int FileDataPreJPColor = 7;
+        /// <summary>
+        /// 每一个 <see cref="JPColor"/> 在二进制文件中的实际存储尺寸
+        /// </summary>
+        public const int PreJPColorDataSize = 7;
+        /// <summary>
+        /// 每一个 <see cref="JPColor"/> 在内存分页中的实际存储尺寸
+        /// </summary>
         public const int MemoryDataPreJPColor = 28;
 
         /* field */

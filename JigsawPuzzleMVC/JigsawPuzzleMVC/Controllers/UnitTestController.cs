@@ -22,14 +22,6 @@ namespace JigsawPuzzle.Controllers
             return Content(content);
         }
 
-        public static List<Type> AllControllers = new List<Type>()
-        {
-            typeof(DashboardController),
-            typeof(ExplorerController),
-            typeof(HomeController),
-            typeof(TaskController),
-            typeof(UnitTestController),
-        };
         [WebAPI(DebugOnly = true)]
         [HttpGet]
         public ActionResult RebuildServerRouteConfig()
@@ -67,7 +59,7 @@ namespace JigsawPuzzle.Controllers
         private ServerRouteConfig GetNewServerRouteConfig()
         {
             List<WebAPIAttribute> WebAPIList = new List<WebAPIAttribute>();
-            foreach (Type type in AllControllers)
+            foreach (Type type in Assembly.GetExecutingAssembly().GetTypes())
                 WebAPIList.AddRange(WebAPIAttribute.GetWebAPI(type));
 
             List<ControllerAction> newWebAPIList = new List<ControllerAction>();

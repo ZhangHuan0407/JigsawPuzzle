@@ -41,7 +41,7 @@ namespace JigsawPuzzle
                 for (int x = 0; x < spriteInfo.Width; x++)
                 {
                     colorData[x, y] = new JPColor(binData, startIndex);
-                    startIndex += JPColor.FileDataPreJPColor;
+                    startIndex += JPColor.PreJPColorDataSize;
                 }
             SpriteColorData.Add(spriteInfo, colorData);
         }

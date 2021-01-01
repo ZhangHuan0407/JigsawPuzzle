@@ -1,5 +1,5 @@
 ﻿{
-  "BaseAddress": "https://192.168.1.4",
+  "BaseAddress": "localhost:44331",
   "WebAPI": [
     {
       "Action": "GetDetailInfo",
@@ -7,7 +7,7 @@
       "DebugOnly": false,
       "FormKeys": [],
       "FormValues": [],
-      "ReturnType": "JigsawPuzzle.Models.DashboardInfo",
+      "ReturnType": "System.String",
       "Type": "HttpGet"
     },
     {
@@ -16,7 +16,7 @@
       "DebugOnly": false,
       "FormKeys": [],
       "FormValues": [],
-      "ReturnType": "System.Collections.Generic.Dictionary",
+      "ReturnType": "System.String",
       "Type": "HttpGet"
     },
     {
@@ -35,6 +35,15 @@
       "FormKeys": [],
       "FormValues": [],
       "ReturnType": "System.String",
+      "Type": "HttpPost"
+    },
+    {
+      "Action": "DownloadFile",
+      "Controller": "Explorer",
+      "DebugOnly": false,
+      "FormKeys": [],
+      "FormValues": [],
+      "ReturnType": "",
       "Type": "HttpPost"
     },
     {
