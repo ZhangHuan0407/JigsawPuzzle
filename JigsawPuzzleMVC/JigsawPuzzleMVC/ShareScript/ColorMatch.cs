@@ -64,13 +64,13 @@ namespace JigsawPuzzle
         {
             Check();
             PreferredPosition.Clear();
-            Point spritetSize = SpriteColorSize;
-            IEnumerable<Point> points = ShiftPosition.EnumItNearly(EffectSpriteColorSize, spritetSize, position, distance);
+            Point spriteSize = SpriteColorSize;
+            IEnumerable<Point> points = ShiftPosition.EnumItNearly(EffectSpriteColorSize, spriteSize, position, distance);
             foreach (Point point in points)
             {
-                Value[,] valueMap = new Value[spritetSize.X, spritetSize.Y];
-                for (int y = 0; y < spritetSize.Y; y++)
-                    for (int x = 0; x < spritetSize.X; x++)
+                Value[,] valueMap = new Value[spriteSize.X, spriteSize.Y];
+                for (int y = 0; y < spriteSize.Y; y++)
+                    for (int x = 0; x < spriteSize.X; x++)
                     {
                         JPColor effectColor = EffectSpriteColor[point.X + x, point.Y + y];
                         JPColor spriteColor = SpriteColor[x, y];

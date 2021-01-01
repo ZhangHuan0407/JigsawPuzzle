@@ -44,6 +44,8 @@ namespace JigsawPuzzle
         /// 精灵图片颜色数据在二进制数据中的起始位置
         /// </summary>
         public long ColorDataStartPosition;
+
+        public Point[] PreferredPositions;
         #endregion RawData
 
         #region  StatisticalData
@@ -59,7 +61,7 @@ namespace JigsawPuzzle
         public ShiftPositionPropensity Propensity;
         [NonSerialized]
         [HideInInspector]
-        public MinValuePointHeap PreferredPositiosn;
+        public MinValuePointHeap PreferredPosHeap;
         [NonSerialized]
         [HideInInspector]
         public float MaxSqrMagnitude;
@@ -74,7 +76,7 @@ namespace JigsawPuzzle
         [NonSerialized]
         public ShiftPositionPropensity Propensity;
         [NonSerialized]
-        public MinValuePointHeap PreferredPositiosn;
+        public MinValuePointHeap PreferredPosHeap;
         [NonSerialized]
         public float MaxSqrMagnitude;
         [NonSerialized]

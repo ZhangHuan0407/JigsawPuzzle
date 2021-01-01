@@ -92,7 +92,7 @@ namespace JigsawPuzzle.UnitTest
                 Random.Range(0, backgroundSize.Y - fontgroundSize.Y));
             int maxDistance = Random.Range(1, 5);
             IEnumerable<Point> shiftPosition = ShiftPosition.EnumItNearly(
-                fontgroundSize, backgroundSize,
+                backgroundSize, fontgroundSize,
                 randomPoint, maxDistance);
             builder.AppendLine($"font : {fontgroundSize}, back : {backgroundSize}, randomPoint : {randomPoint}, maxDistance : {maxDistance}");
             foreach (Point position in shiftPosition)
