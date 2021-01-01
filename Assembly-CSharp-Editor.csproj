@@ -68,6 +68,7 @@
     <Compile Include="Assets\JigsawPuzzle\Editor\ControllerAction.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\HttpContentConverter.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\JPColor.cs" />
+    <Compile Include="Assets\JigsawPuzzle\Editor\JPFileMap.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\JPRGBAColorMatch.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\JPTask.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\JPTaskConnector.cs" />

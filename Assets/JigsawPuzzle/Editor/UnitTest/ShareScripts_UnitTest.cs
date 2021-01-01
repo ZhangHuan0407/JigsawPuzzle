@@ -52,7 +52,7 @@ namespace JigsawPuzzle.UnitTest
                 {
                     string mvcLastWriteTime = new FileInfo(mvcScriptFilePath).LastWriteTime.ToString();
                     string unityLastWriteTime = new FileInfo(unityScriptFilePath).LastWriteTime.ToString();
-                    Debug.LogError($"File is not equal, {scriptFilePath}\n MVC : {mvcScriptFileExists} LastWriteTime : {mvcLastWriteTime}, Unity : {unityScriptFileExists} LastWriteTime : {unityLastWriteTime}");
+                    Debug.LogError($"File is not equal, {scriptFilePath}\n MVC : {mvcScriptFileExists} LastWriteTime : {mvcLastWriteTime},\nUnity : {unityScriptFileExists} LastWriteTime : {unityLastWriteTime}");
                     continue;
                 }
             }

@@ -12,6 +12,7 @@ namespace JigsawPuzzle
     {
         /* field */
         internal Lazy<JPTaskConnector> Connector = new Lazy<JPTaskConnector>(() => CreateJPTaskConnector());
+        internal JPFileMap FileMap;
 
         /* ctor */
         [MenuItem("Custom Tool/Jigsaw Puzzle")]
@@ -30,9 +31,18 @@ namespace JigsawPuzzle
 
         private void OnGUI()
         {
-            if (GUILayout.Button("1"))
+            if (GUILayout.Button("GetNew"))
             {
                 JigsawPuzzleAsset.GetNew();
+            }
+            // 线程不安全!
+            if (GUILayout.Button("GetFileMap"))
+                Connector.Value.Get("GetFileMapJson", "Explorer", (object obj) => { FileMap = obj as JPFileMap; });
+            if (FileMap != null)
+            {
+                foreach (string task in FileMap.Task)
+                    if (GUILayout.Button(task))
+                        JPTask.StartRemoteTask(Connector.Value, new string[] { $"Task/{task}" });
             }
         }
     }

@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
-using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-
-#if UNITY_EDITOR
-using UnityEngine;
-#else
-using Newtonsoft.Json;
-#endif
 
 namespace JigsawPuzzle
 {
@@ -16,13 +11,15 @@ namespace JigsawPuzzle
     internal class JPTask
     {
         /* field */
-        internal readonly FileInfo InfoDataFile;
         internal readonly FileInfo BinDataFile;
+        internal readonly FileInfo InfoDataFile;
 
+        internal SpriteInfo EffectSpriteInfo;
         internal JigsawPuzzleInfoData JPInfoData;
         internal SpriteColorContainer SpriteColor;
-        internal SpriteInfo EffectSpriteInfo;
         internal List<SpriteInfo> SpritesInfo;
+        internal Stopwatch TaskStopwatch;
+        internal StringBuilder Builder;
 
         /* ctor */
         internal JPTask(FileInfo infoDataFile, FileInfo binDataFile)
@@ -46,6 +43,7 @@ namespace JigsawPuzzle
                 if (!TryReloadDataAncCheck())
                     throw new ArgumentException($"Throw Exception where invoke {nameof(JPTask)}.{nameof(TryReloadDataAncCheck)}");
 
+                InitParameter();
                 Pretreatment();
                 SpeculatePreferredPosition();
                 PredictLayout();
@@ -54,12 +52,14 @@ namespace JigsawPuzzle
             }
             catch (Exception e)
             {
-                // Log
-                Console.WriteLine($"{e.Message}\n{e.StackTrace}");
+                Builder.AppendLine($"{nameof(DateTime)} : {DateTime.Now}")
+                    .AppendLine(e.Message)
+                    .AppendLine(e.StackTrace);
             }
             finally
             {
                 SpriteColor?.Clear();
+                File.WriteAllText($"{InfoDataFile.FullName}.log", Builder.ToString());
             }
         }
         private bool TryReloadDataAncCheck()
@@ -89,6 +89,12 @@ namespace JigsawPuzzle
                     SpritesInfo.Add(spriteInfo);
             }
             return true;
+        }
+        private void InitParameter()
+        {
+            TaskStopwatch = Stopwatch.StartNew();
+            Builder = new StringBuilder();
+            Builder.AppendLine($"Finish {nameof(InitParameter)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
         }
         private void Pretreatment()
         {
@@ -153,6 +159,7 @@ namespace JigsawPuzzle
                 spriteInfo.PreferredPositiosn.AddMinItem(preferredPosition, maxSqrMagnitude);
                 spriteInfo.MaxSqrMagnitude = maxSqrMagnitude;
             }
+            Builder.AppendLine($"Finish {nameof(Pretreatment)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
         }
         private void SpeculatePreferredPosition()
         {
@@ -184,11 +191,12 @@ namespace JigsawPuzzle
                     spriteInfo.PreferredPositiosn.AddMinItem(bestPosition.Item1, bestPosition.Item2);
                 }
             }
+            Builder.AppendLine($"Finish {nameof(SpeculatePreferredPosition)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
         }
         [Obsolete("当前此方法不具有实际功能")]
         private void PredictLayout()
         {
-
+            Builder.AppendLine($"Finish {nameof(PredictLayout)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
         }
         private void FreeTemp()
         {
@@ -197,12 +205,34 @@ namespace JigsawPuzzle
             EffectSpriteInfo = null;
             SpritesInfo.Clear();
             SpritesInfo = null;
+            Builder.AppendLine($"Finish {nameof(FreeTemp)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
         }
         private void WriteOutResult()
         {
             JPInfoData.UpdateTime();
             string contents = JsonFuck.FromObjectToJson(JPInfoData);
             File.WriteAllText(InfoDataFile.FullName, contents);
+            Builder.AppendLine($"Finish {nameof(WriteOutResult)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
+        }
+
+        internal static void StartRemoteTask(JPTaskConnector connector, string[] filesName)
+        {
+            if (connector is null)
+                throw new ArgumentNullException(nameof(connector));
+            if (filesName is null)
+                throw new ArgumentNullException(nameof(filesName));
+
+            connector.PostForm("SelectFiles", "Explorer",
+                new Dictionary<string, object>(){ { "File", filesName } },
+                (object selectFilesMessage) => 
+                {
+                    UnityEngine.Debug.Log(selectFilesMessage);
+                    connector.Get("StartNew", "Task",
+                        (object startNewMessage) =>
+                        {
+                            UnityEngine.Debug.Log(startNewMessage);
+                        });
+                });
         }
     }
 }

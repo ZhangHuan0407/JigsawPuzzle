@@ -25,9 +25,9 @@ namespace JigsawPuzzle
 
         /* inter */
         public string AssetFullName => $"{AssetDirectory}/{DataName}.asset";
-        public string InfoDataName => $"{DataName}.json";
+        public string InfoDataName => $"Task/{DataName}.json";
         public string InfoDataFullName => $"{AssetDirectory}/{DataName}.json";
-        public string BinDataName => $"{DataName}.bytes";
+        public string BinDataName => $"Task/{DataName}.bytes";
         public string BinDataFullName => $"{AssetDirectory}/{DataName}.bytes";
 
         /* ctor */
@@ -102,14 +102,14 @@ namespace JigsawPuzzle
             connector.PostFile(
                 "Explorer", "UploadFiles",
                 BinData, "File", $"{BinDataName}",
-                (object obj) => Debug.Log($"Task/CreateNewData success.{obj}"),
-                (HttpResponseMessage message) => Debug.LogError($"Task/CreateNewData failed.\n{message.Content.ReadAsStringAsync().Result}"));
+                (object obj) => Debug.Log($"Task/CreateNewData success. File : {BinDataName}\n{obj}"),
+                (HttpResponseMessage message) => Debug.LogError($"Task/CreateNewData failed. File : {BinDataName}\n{message.Content.ReadAsStringAsync().Result}"));
             BinData = File.ReadAllBytes(InfoDataFullName);
             connector.PostFile(
                 "Explorer", "UploadFiles",
                 BinData, "File", $"{InfoDataName}",
-                (object obj) => Debug.Log($"Task/CreateNewData success.{obj}"),
-                (HttpResponseMessage message) => Debug.LogError($"Task/CreateNewData failed.\n{message.Content.ReadAsStringAsync().Result}"));
+                (object obj) => Debug.Log($"Task/CreateNewData success. File : {InfoDataName}\n{obj}"),
+                (HttpResponseMessage message) => Debug.LogError($"Task/CreateNewData failed. File : {InfoDataName}\n{message.Content.ReadAsStringAsync().Result}"));
         }
 
         public static IEnumerable<string> GetAssetList() => Directory.GetFiles(AssetDirectory, "*.asset");

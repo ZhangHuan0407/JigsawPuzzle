@@ -47,7 +47,12 @@ namespace JigsawPuzzle
             LinkedListNode<(Point, float)> node = PositionList.First;
             if (value > Limit)
                 return;
-            else if (PositionList.Count >= Capacity 
+            else if (PositionList.Count == 0)
+            {
+                PositionList.AddFirst((position, value));
+                return;
+            }
+            else if (PositionList.Count >= Capacity
                 && value > node.Value.Item2)
                 return;
             while (true)

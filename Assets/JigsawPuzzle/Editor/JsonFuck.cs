@@ -47,6 +47,7 @@ namespace JigsawPuzzle
             return JsonUtility.FromJson(jsonContent, t);
 #elif MVC
             object obj = JsonConvert.DeserializeObject(jsonContent, t);
+            // Bugnity 不能序列化字典之类的类型，而且序列化前后调用此接口
             if (obj is ISerializationCallbackReceiver receiver)
                 receiver.OnAfterDeserialize();
             return obj;

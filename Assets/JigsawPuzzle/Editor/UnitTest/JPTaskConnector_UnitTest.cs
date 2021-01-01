@@ -22,7 +22,7 @@ namespace JigsawPuzzle.UnitTest
         {
             JigsawPuzzleWindow window = EditorWindow.GetWindow<JigsawPuzzleWindow>();
             window.Connector.Value.Get(
-                "Dashboard", "GetDetailInfo",
+                "GetDetailInfo", "Dashboard", 
                 (object obj) => 
                 {
                     Debug.Log($"Finish Dashboard/GetDetailInfo data :\n{obj}");
@@ -39,7 +39,7 @@ namespace JigsawPuzzle.UnitTest
         {
             JigsawPuzzleWindow window = EditorWindow.GetWindow<JigsawPuzzleWindow>();
             window.Connector.Value.Get(
-                "Explorer", "GetFileMapJson",
+                "GetFileMapJson", "Explorer", 
                 (object obj) =>
                 {
                     Debug.Log($"Finish Explorer/GetFileMapJson data :\n{obj}");
@@ -58,7 +58,7 @@ namespace JigsawPuzzle.UnitTest
             JPTaskConnector value = EditorWindow.GetWindow<JigsawPuzzleWindow>().Connector.Value;
 
             HttpClient client = fieldInfo.GetValue(value) as HttpClient;
-            value.PostForm("Explorer", "SelectFiles", new Dictionary<string, object>
+            value.PostForm("SelectFiles", "Explorer", new Dictionary<string, object>
             {
                 { "File", new string[]{ "11111", "22222", "33333" } },
             }, 

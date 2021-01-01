@@ -68,12 +68,12 @@ namespace JigsawPuzzle
         /// 发送一个受到监视的 Get 请求，如果传输的数据格式不正确，不会执行回掉
         /// <para>如果需要一个明确的任务结束标记，可以等待返回任务结束</para>
         /// </summary>
-        /// <param name="controller">MVC 公开控制器</param>
         /// <param name="action">MVC 公开 HttpGet 行为</param>
+        /// <param name="controller">MVC 公开控制器</param>
         /// <param name="success">服务器回复数据，检查通过</param>
         /// <param name="failed">链接中出现错误，或服务器返回执行不通过的状态码</param>
         /// <returns>执行任务</returns>
-        public Task Get(string controller, string action,
+        public Task Get(string action, string controller,
             Action<object> success,
             Action<HttpResponseMessage> failed = null)
         {
@@ -118,7 +118,7 @@ namespace JigsawPuzzle
                 {
                     // Log : Controller/Action
 #if UNITY_EDITOR
-                    Debug.LogError($"{e.Message}\n{e.StackTrace}");
+                    Debug.LogError($"{controllerAction.Controller}/{controllerAction.Action}\n{e.Message}\n{e.StackTrace}");
 #else
                     Console.WriteLine($"{e.Message}\n{e.StackTrace}");
 #endif
@@ -133,13 +133,13 @@ namespace JigsawPuzzle
         /// 发送一个受到监视的 Post 请求，如果传输的数据格式不正确，不会执行回掉
         /// <para>如果需要一个明确的任务结束标记，可以等待返回任务结束</para>
         /// </summary>
-        /// <param name="controller">MVC 公开控制器</param>
         /// <param name="action">MVC 公开 HttpPost 行为</param>
+        /// <param name="controller">MVC 公开控制器</param>
         /// <param name="data">发送的数据</param>
         /// <param name="success">服务器回复数据，检查通过</param>
         /// <param name="failed">链接中出现错误，或服务器返回执行不通过的状态码</param>
         /// <returns>执行任务</returns>
-        public void PostForm(string controller, string action,
+        public void PostForm(string action, string controller,
             Dictionary<string, object> data,
             Action<object> success = null,
             Action<HttpResponseMessage> failed = null)
@@ -216,7 +216,7 @@ namespace JigsawPuzzle
                 {
                     // Log : Controller/Action
 #if UNITY_EDITOR
-                    Debug.LogError($"{e.Message}\n{e.StackTrace}");
+                    Debug.LogError($"{controllerAction.Controller}/{controllerAction.Action}\n{e.Message}\n{e.StackTrace}");
 #else
                     Console.WriteLine($"{e.Message}\n{e.StackTrace}");
 #endif
@@ -250,24 +250,39 @@ namespace JigsawPuzzle
                     responseMessage = Client.PostAsync($"{controller}/{action}", form);
                     responseMessage.Wait();
                     object resultObject = null;
-                    if (responseMessage.Result.IsSuccessStatusCode)
-                    {
-                        resultObject = HttpContentConverter.HttpContentToObject[controllerAction.ReturnType](responseMessage.Result.Content);
-                        success?.Invoke(resultObject);
-                        return;
-                    }
-                    else
+                    if (!responseMessage.Result.IsSuccessStatusCode)
                     {
                         Action<HttpResponseMessage> copy = failed;
                         failed = null;
                         copy?.Invoke(responseMessage.Result);
+                        goto AfterCallback;
                     }
+                    else if (HttpContentConverter.HttpContentToObject.TryGetValue(controllerAction.ReturnType, out Func<HttpContent, object> converter))
+                    {
+                        resultObject = converter(responseMessage.Result.Content);
+                        goto BeforeCallback;
+                    }
+
+                    Type returnType = controllerAction.GetSerializedReturnType();
+                    if (returnType == null)
+                        throw new ArgumentNullException($"{controllerAction.ReturnType} is not defined converter.");
+                    else
+                    {
+                        string jsonResult = responseMessage.Result.Content.ReadAsStringAsync().Result;
+                        resultObject = JsonFuck.FromJsonToObject(jsonResult, returnType);
+                        goto BeforeCallback;
+                    }
+
+                BeforeCallback:
+                    success?.Invoke(resultObject);
+                AfterCallback:
+                    failed = null;
                 }
                 catch (Exception e)
                 {
                     // Log : Controller/Action
 #if UNITY_EDITOR
-                    Debug.LogError($"{e.Message}\n{e.StackTrace}");
+                    Debug.LogError($"{controllerAction.Controller}/{controllerAction.Action}\n{e.Message}\n{e.StackTrace}");
 #else
                     Console.WriteLine($"{e.Message}\n{e.StackTrace}");
 #endif

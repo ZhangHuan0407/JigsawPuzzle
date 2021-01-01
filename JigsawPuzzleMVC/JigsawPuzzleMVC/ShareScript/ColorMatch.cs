@@ -15,22 +15,6 @@ namespace JigsawPuzzle
         public JPColor[,] SpriteColor { get; protected set; }
 
         /* inter */
-        public bool Check
-        {
-            get
-            {
-                if (EffectSpriteColor is null)
-                    return false;
-                else if (SpriteColor is null)
-                    return false;
-                else if (SpriteColor.GetLength(0) > EffectSpriteColor.GetLength(0))
-                    return false;
-                else if (SpriteColor.GetLength(1) > EffectSpriteColor.GetLength(1))
-                    return false;
-                return true;
-            }
-        }
-
         public Point EffectSpriteColorSize => new Point(EffectSpriteColor.GetLength(0), EffectSpriteColor.GetLength(1));
         public Point SpriteColorSize => new Point(SpriteColor.GetLength(0), SpriteColor.GetLength(1));
 
@@ -41,11 +25,20 @@ namespace JigsawPuzzle
         }
 
         /* func */
+        protected virtual void Check()
+        {
+            if (EffectSpriteColor is null)
+                throw new ArgumentNullException(nameof(EffectSpriteColor));
+            if (SpriteColor is null)
+                throw new ArgumentNullException(nameof(SpriteColor));
+            else if (SpriteColor.GetLength(0) > EffectSpriteColor.GetLength(0)
+                || SpriteColor.GetLength(1) > EffectSpriteColor.GetLength(1))
+                throw new ArgumentException($"{nameof(EffectSpriteColorSize)} : {EffectSpriteColorSize}, {nameof(SpriteColorSize)} : {SpriteColorSize}");
+        }
+
         public virtual void TryGetPreferredPosition()
         {
-            if (!Check)
-                throw new ArgumentException("Not pass check");
-
+            Check();
             PreferredPosition.Clear();
             Point spritetSize = SpriteColorSize;
             foreach (Point point in GetShiftPosition())
@@ -69,9 +62,7 @@ namespace JigsawPuzzle
 
         public virtual void TryGetNearlyPreferredPosition(Point position, int distance)
         {
-            if (!Check)
-                throw new ArgumentException("Not pass check");
-
+            Check();
             PreferredPosition.Clear();
             Point spritetSize = SpriteColorSize;
             IEnumerable<Point> points = ShiftPosition.EnumItNearly(EffectSpriteColorSize, spritetSize, position, distance);

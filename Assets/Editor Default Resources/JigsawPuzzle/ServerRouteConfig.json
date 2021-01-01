@@ -16,7 +16,7 @@
       "DebugOnly": false,
       "FormKeys": [],
       "FormValues": [],
-      "ReturnType": "System.String",
+      "ReturnType": "JigsawPuzzle.JPFileMap",
       "Type": "HttpGet"
     },
     {
