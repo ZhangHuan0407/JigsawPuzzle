@@ -142,6 +142,7 @@
     <Compile Include="ShareScript\JPRGBAColorMatch.cs" />
     <Compile Include="ShareScript\JPTask.cs" />
     <Compile Include="ShareScript\JPVector3.cs" />
+    <Compile Include="ShareScript\JsonFuck.cs" />
     <Compile Include="ShareScript\MinValuePointHeap.cs" />
     <Compile Include="ShareScript\ServerRouteConfig.cs" />
     <Compile Include="ShareScript\ShiftPosition.cs" />

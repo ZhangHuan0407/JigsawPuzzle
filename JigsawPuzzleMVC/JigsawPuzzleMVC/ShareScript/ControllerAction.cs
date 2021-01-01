@@ -70,8 +70,8 @@ namespace JigsawPuzzle
         {
             Type returnType = Assembly.GetExecutingAssembly().GetType(ReturnType, false);
             if (returnType is null
-                || returnType.GetCustomAttribute<SerializableAttribute>(false) != null
-                || returnType.GetCustomAttribute<ShareScriptAttribute>(false) != null)
+                || returnType.GetCustomAttribute<SerializableAttribute>(false) == null
+                || returnType.GetCustomAttribute<ShareScriptAttribute>(false) == null)
                 return null;
             else
                 return returnType;

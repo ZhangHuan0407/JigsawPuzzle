@@ -169,15 +169,15 @@ namespace JigsawPuzzle
                         }
 
                         Type objType = obj.GetType();
-                        if (objType.GetCustomAttribute<SerializableAttribute>(false) != null
-                            || objType.GetCustomAttribute<ShareScriptAttribute>(false) != null)
+                        if (objType.GetCustomAttribute<SerializableAttribute>(false) == null
+                            || objType.GetCustomAttribute<ShareScriptAttribute>(false) == null)
+                            throw new ArgumentNullException($"{itemType} is not defined converter.");
+                        else
                         {
                             string content = JsonFuck.FromObjectToJson(obj);
                             form.Add(new StringContent(content), itemName);
                             goto PostMessage;
                         }
-                        else
-                            throw new ArgumentNullException($"{itemType} is not defined converter.");
                     }
                 PostMessage:
                     responseMessage = Client.PostAsync($"{controller}/{action}", form);
