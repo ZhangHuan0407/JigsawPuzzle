@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace JigsawPuzzle
 {
     [ShareScript]
-    public abstract class ColorMatch<Value, AverageValue> : IEnumerable<(Point, AverageValue)>
+    public abstract class ColorMatch<Value, AverageValue> : IEnumerable<(Point, AverageValue)> where Value : new()
     {
+        /* const */
+        public const int MaxCount = 500;
+
         /* field */
         public Point CenterPosition { get; protected set; }
         public JPColor[,] EffectSpriteColor { get; protected set; }
         public List<(Point, AverageValue)> PreferredPosition { get; protected set; }
         public ShiftPositionPropensity Propensity { get; protected set; }
         public JPColor[,] SpriteColor { get; protected set; }
+        public Point[] EffectiveArea { get; protected set; }
 
         /* inter */
         public Point EffectSpriteColorSize => new Point(EffectSpriteColor.GetLength(0), EffectSpriteColor.GetLength(1));
@@ -41,21 +46,48 @@ namespace JigsawPuzzle
             Check();
             PreferredPosition.Clear();
             Point spritetSize = SpriteColorSize;
+            Value[,] valueMap = new Value[spritetSize.X, spritetSize.Y];
+
+            EffectiveArea = GetEffectiveArea();
             foreach (Point point in GetShiftPosition())
             {
-                Value[,] valueMap = new Value[spritetSize.X, spritetSize.Y];
-                for (int y = 0; y < spritetSize.Y; y++)
-                    for (int x = 0; x < spritetSize.X; x++)
+                foreach (Point selectPoint in EffectiveArea)
+                {
+                    JPColor spriteColor = SpriteColor[selectPoint.X, selectPoint.Y];
+                    if (spriteColor.A == 0f)
+                        valueMap[selectPoint.X, selectPoint.Y] = new Value();
+                    else
                     {
-                        JPColor effectColor = EffectSpriteColor[point.X + x, point.Y + y];
-                        JPColor spriteColor = SpriteColor[x, y];
-                        GetDeltaValue(effectColor, spriteColor);
+                        JPColor effectColor = EffectSpriteColor[point.X + selectPoint.X, point.Y + selectPoint.Y];
+                        valueMap[selectPoint.X, selectPoint.Y] = GetDeltaValue(effectColor, spriteColor);
                     }
+                }
 
                 if (ValueMapIsBetter(valueMap, out AverageValue averageValue))
                     PreferredPosition.Add((point, averageValue));
             }
         }
+        protected virtual Point[] GetEffectiveArea()
+        {
+            List<Point> result = new List<Point>();
+            IEnumerable<Point> enumPoints;
+            int count = EffectSpriteColor.Length;
+            if (count < MaxCount)
+                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.Zero, ShiftPositionPropensity.LineByLine).ToArray();
+            else if (count < MaxCount * 4)
+                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.Zero, ShiftPositionPropensity.Interval2).ToArray();
+            else
+                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.Zero, ShiftPositionPropensity.Interval3).ToArray();
+
+            foreach (Point enumPoint in enumPoints)
+            {
+                JPColor enumPointColor = SpriteColor[enumPoint.X, enumPoint.Y];
+                if (enumPointColor.A > 0)
+                    result.Add(enumPoint);
+            }
+            return result.ToArray();
+        }
+
         protected virtual IEnumerable<Point> GetShiftPosition() => ShiftPosition.EnumIt(EffectSpriteColorSize, SpriteColorSize, Propensity);
         protected abstract Value GetDeltaValue(JPColor effectColor, JPColor spriteColor);
         protected abstract bool ValueMapIsBetter(Value[,] valueMap, out AverageValue averageValue);
@@ -66,16 +98,17 @@ namespace JigsawPuzzle
             PreferredPosition.Clear();
             Point spriteSize = SpriteColorSize;
             IEnumerable<Point> points = ShiftPosition.EnumItNearly(EffectSpriteColorSize, spriteSize, position, distance);
+            EffectiveArea = GetEffectiveArea();
+
             foreach (Point point in points)
             {
                 Value[,] valueMap = new Value[spriteSize.X, spriteSize.Y];
-                for (int y = 0; y < spriteSize.Y; y++)
-                    for (int x = 0; x < spriteSize.X; x++)
-                    {
-                        JPColor effectColor = EffectSpriteColor[point.X + x, point.Y + y];
-                        JPColor spriteColor = SpriteColor[x, y];
-                        GetDeltaValue(effectColor, spriteColor);
-                    }
+                foreach (Point selectPoint in EffectiveArea)
+                {
+                    JPColor effectColor = EffectSpriteColor[point.X + selectPoint.X, point.Y + selectPoint.Y];
+                    JPColor spriteColor = SpriteColor[selectPoint.X, selectPoint.Y];
+                    GetDeltaValue(effectColor, spriteColor);
+                }
 
                 if (ValueMapIsBetter(valueMap, out AverageValue averageValue))
                     PreferredPosition.Add((point, averageValue));
