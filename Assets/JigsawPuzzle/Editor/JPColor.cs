@@ -61,5 +61,11 @@
             float delta = (one.H - another.H) * ratio;
             return delta > 0 ? delta : -delta;
         }
+
+        /* operator */
+        public override string ToString()
+        {
+            return $"RGRA {R},{G},{B},{A} HSV {H},{S},{V}";
+        }
     }
 }

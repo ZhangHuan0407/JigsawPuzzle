@@ -34,6 +34,10 @@ namespace JigsawPuzzle.Controllers
 
                 FileInfo binDataFile = new FileInfo(infoDataFile.FullName.Replace(".json", ".bytes"));
                 JPTask task = new JPTask(infoDataFile, binDataFile);
+
+#if DEBUG && MVC
+                task.Log = Session[nameof(Log)] as Log;
+#endif
                 task.Start();
                 return new HttpStatusCodeResult(200, "Start New Task successful") as ActionResult;
             });

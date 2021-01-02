@@ -8,6 +8,7 @@
     {
         /* const */
         public static readonly Point Zero = new Point();
+        public static readonly Point One = new Point(1, 1);
 
         /* field */
         /// <summary>

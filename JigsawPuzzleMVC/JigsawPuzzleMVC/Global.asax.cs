@@ -50,6 +50,7 @@ namespace JigsawPuzzleMVC
         protected void Session_Start(object sender, EventArgs e)
         {
             Log log = Application[nameof(Log)] as Log;
+            Session[nameof(Log)] = log;
             log.WriteData(Session, $"Session_Start\nUserHostAddress : {Request.UserHostAddress}\nUserAgent : {Request.UserAgent}\nUserHostName : {Request.UserHostName}");
         }
         /// <summary>

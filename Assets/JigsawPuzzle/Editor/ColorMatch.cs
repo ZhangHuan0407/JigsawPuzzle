@@ -9,7 +9,7 @@ namespace JigsawPuzzle
     public abstract class ColorMatch<Value, AverageValue> : IEnumerable<(Point, AverageValue)> where Value : new()
     {
         /* const */
-        public const int MaxCount = 500;
+        public const int ZipCount = 500;
 
         /* field */
         public Point CenterPosition { get; protected set; }
@@ -18,6 +18,9 @@ namespace JigsawPuzzle
         public ShiftPositionPropensity Propensity { get; protected set; }
         public JPColor[,] SpriteColor { get; protected set; }
         public Point[] EffectiveArea { get; protected set; }
+#if DEBUG && MVC
+        public Analysis.Log Log;
+#endif
 
         /* inter */
         public Point EffectSpriteColorSize => new Point(EffectSpriteColor.GetLength(0), EffectSpriteColor.GetLength(1));
@@ -51,8 +54,9 @@ namespace JigsawPuzzle
             EffectiveArea = GetEffectiveArea();
             foreach (Point point in GetShiftPosition())
             {
-                foreach (Point selectPoint in EffectiveArea)
+                for (int index = 0; index < EffectiveArea.Length; index++)
                 {
+                    Point selectPoint = EffectiveArea[index];
                     JPColor spriteColor = SpriteColor[selectPoint.X, selectPoint.Y];
                     if (spriteColor.A == 0f)
                         valueMap[selectPoint.X, selectPoint.Y] = new Value();
@@ -66,18 +70,24 @@ namespace JigsawPuzzle
                 if (ValueMapIsBetter(valueMap, out AverageValue averageValue))
                     PreferredPosition.Add((point, averageValue));
             }
+#if DEBUG && MVC
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+            foreach ((Point, AverageValue) point in PreferredPosition)
+                builder.AppendLine($"{point.Item1} {point.Item2}");
+            Log.WriteData(null, "ColorMatch.TryGetPreferredPosition, PreferredPosition : ", builder.ToString());
+#endif
         }
         protected virtual Point[] GetEffectiveArea()
         {
             List<Point> result = new List<Point>();
             IEnumerable<Point> enumPoints;
             int count = EffectSpriteColor.Length;
-            if (count < MaxCount)
-                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.Zero, ShiftPositionPropensity.LineByLine).ToArray();
-            else if (count < MaxCount * 4)
-                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.Zero, ShiftPositionPropensity.Interval2).ToArray();
+            if (count < ZipCount)
+                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.One, ShiftPositionPropensity.LineByLine).ToArray();
+            else if (count < ZipCount * 4)
+                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.One, ShiftPositionPropensity.Interval2).ToArray();
             else
-                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.Zero, ShiftPositionPropensity.Interval3).ToArray();
+                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.One, ShiftPositionPropensity.Interval3).ToArray();
 
             foreach (Point enumPoint in enumPoints)
             {

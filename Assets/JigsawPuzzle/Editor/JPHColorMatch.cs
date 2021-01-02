@@ -6,7 +6,7 @@ namespace JigsawPuzzle
     public class JPHColorMatch : ColorMatch<float, float>
     {
         /* const */
-        public const float DefaultMaxDelta = 0.1f;
+        public const float DefaultMaxDelta = 0.04f;
 
         /* field */
         public float MaxDelta;
