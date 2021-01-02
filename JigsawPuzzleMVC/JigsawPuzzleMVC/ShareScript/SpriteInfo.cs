@@ -45,7 +45,7 @@ namespace JigsawPuzzle
         /// </summary>
         public long ColorDataStartPosition;
 
-        public Point[] PreferredPositions;
+        public WeightedPoint[] PreferredPositions;
         #endregion RawData
 
         #region  StatisticalData

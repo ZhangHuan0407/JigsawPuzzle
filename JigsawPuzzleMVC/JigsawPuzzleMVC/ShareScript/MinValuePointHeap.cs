@@ -12,7 +12,7 @@ namespace JigsawPuzzle
     public class MinValuePointHeap
     {
         /* field */
-        public LinkedList<(Point, float)> PositionList;
+        public LinkedList<WeightedPoint> PositionList;
         /// <summary>
         /// 位置堆的存储容量
         /// </summary>
@@ -33,7 +33,7 @@ namespace JigsawPuzzle
 
             Capacity = capacity;
             Limit = limitDefault;
-            PositionList = new LinkedList<(Point, float)>();
+            PositionList = new LinkedList<WeightedPoint>();
         }
 
         /* func */
@@ -43,26 +43,29 @@ namespace JigsawPuzzle
         /// </summary>
         /// <param name="position">位置</param>
         /// <param name="value">值</param>
-        public virtual void AddMinItem(Point position, float value)
+        public virtual void AddMinItem(WeightedPoint weightedPoint)
         {
-            LinkedListNode<(Point, float)> node = PositionList.First;
-            if (value >= Limit)
+            if (weightedPoint is null)
+                throw new ArgumentNullException(nameof(weightedPoint));
+
+            LinkedListNode<WeightedPoint> node = PositionList.First;
+            if (weightedPoint.Value >= Limit)
                 return;
             else if (PositionList.Count == 0)
             {
-                PositionList.AddFirst((position, value));
+                PositionList.AddFirst(weightedPoint);
                 return;
             }
             else if (PositionList.Count >= Capacity
-                && value > node.Value.Item2)
+                && weightedPoint.Value > node.Value.Value)
                 return;
             while (true)
             {
-                if (value < node.Value.Item2)
+                if (weightedPoint.Value < node.Value.Value)
                 {
                     if (node.Next is null)
                     {
-                        PositionList.AddAfter(node, (position, value));
+                        PositionList.AddAfter(node, weightedPoint);
                         break;
                     }
                     else
@@ -70,27 +73,19 @@ namespace JigsawPuzzle
                 }
                 else
                 {
-                    PositionList.AddBefore(node, (position, value));
+                    PositionList.AddBefore(node, weightedPoint);
                     break;
                 }
             }
             if (PositionList.Count > Capacity)
                 PositionList.RemoveFirst();
-            Limit = PositionList.First.Value.Item2;
+            Limit = weightedPoint.Value;
         }
 
-        internal (Point, float)[] ToArray()
+        internal WeightedPoint[] ToArray()
         {
-            (Point, float)[] copy = new (Point, float)[PositionList.Count];
+            WeightedPoint[] copy = new WeightedPoint[PositionList.Count];
             PositionList.CopyTo(copy, 0);
-            return copy;
-        }
-        internal Point[] GetPoints()
-        {
-            Point[] copy = new Point[PositionList.Count];
-            int index = 0;
-            foreach ((Point, float) position in PositionList)
-                copy[index++] = position.Item1;
             return copy;
         }
     }

@@ -156,6 +156,7 @@
     <Compile Include="ShareScript\SpriteColorContainer.cs" />
     <Compile Include="ShareScript\SpriteInfo.cs" />
     <Compile Include="ShareScript\JPTaskConnector.cs" />
+    <Compile Include="ShareScript\WeightedPoint.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />

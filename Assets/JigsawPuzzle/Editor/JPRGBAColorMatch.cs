@@ -50,7 +50,7 @@ namespace JigsawPuzzle
             return value < TotalMaxDelta;
         }
 
-        public override (Point, float) BestOne()
+        public override WeightedPoint BestOne()
         {
             Point bestPoint = Point.Zero;
             float minValue = 1f;
@@ -60,7 +60,7 @@ namespace JigsawPuzzle
                     bestPoint = position.Item1;
                     minValue = position.Item2;
                 }
-            return (bestPoint, minValue);
+            return new WeightedPoint(bestPoint, minValue);
         }
     }
 }

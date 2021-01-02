@@ -91,6 +91,7 @@
     <Compile Include="Assets\JigsawPuzzle\Editor\UnitTest\JPTaskConnector_UnitTest.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\UnitTest\ShareScripts_UnitTest.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\UnitTest\ShiftPosition_UnitTest.cs" />
+    <Compile Include="Assets\JigsawPuzzle\Editor\WeightedPoint.cs" />
     <Reference Include="UnityEngine">
       <HintPath>A:/Unity/2019.4.9f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

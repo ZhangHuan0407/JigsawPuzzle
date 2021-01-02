@@ -138,7 +138,7 @@ namespace JigsawPuzzle
 #endif
                 match.TryGetPreferredPosition();
                 foreach ((Point, float) capture in match)
-                    spriteInfo.PreferredPosHeap.AddMinItem(capture.Item1, capture.Item2);
+                    spriteInfo.PreferredPosHeap.AddMinItem(new WeightedPoint(capture.Item1, capture.Item2));
 #if DEBUG && MVC && !PARALLELMODE
                 StringBuilder builder = new StringBuilder();
                 foreach ((Point, float) point in spriteInfo.PreferredPosHeap.ToArray())
@@ -160,23 +160,23 @@ namespace JigsawPuzzle
                 if (spriteInfo.Propensity == ShiftPositionPropensity.None)
                     return;
 
-                (Point, float)[] preferredPositions = spriteInfo.PreferredPosHeap.ToArray();
+                WeightedPoint[] preferredPositions = spriteInfo.PreferredPosHeap.ToArray();
                 spriteInfo.PreferredPosHeap = new MinValuePointHeap(10, JPRGBAColorMatch.DefaultMaxSqrMagnitude);
-                foreach ((Point, float) position in preferredPositions)
+                foreach (WeightedPoint weightPoint in preferredPositions)
                 {
                     JPRGBAColorMatch accurateMatch = new JPRGBAColorMatch(
                     effectSpriteColor,
                     SpriteColor[spriteInfo],
                     ShiftPositionPropensity.None,
-                    position.Item2);
+                    weightPoint.Value);
 #if DEBUG && MVC && !PARALLELMODE
                     accurateMatch.Log = Log;
 #endif
-                    accurateMatch.TryGetNearlyPreferredPosition(position.Item1, spriteInfo.AccurateDistance);
-                    (Point, float) bestPosition = accurateMatch.BestOne();
-                    spriteInfo.PreferredPosHeap.AddMinItem(bestPosition.Item1, bestPosition.Item2);
+                    accurateMatch.TryGetNearlyPreferredPosition(weightPoint.Position, spriteInfo.AccurateDistance);
+                    WeightedPoint bestPosition = accurateMatch.BestOne();
+                    spriteInfo.PreferredPosHeap.AddMinItem(bestPosition);
                 }
-                spriteInfo.PreferredPositions = spriteInfo.PreferredPosHeap.GetPoints();
+                spriteInfo.PreferredPositions = spriteInfo.PreferredPosHeap.ToArray();
             });
             Builder.AppendLine($"Finish {nameof(SpeculatePreferredPosition)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
         }

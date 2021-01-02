@@ -125,7 +125,7 @@ namespace JigsawPuzzle
             }
         }
 
-        public abstract (Point, AverageValue) BestOne();
+        public abstract WeightedPoint BestOne();
 
         /* IEnumerable */
         public IEnumerator<(Point, AverageValue)> GetEnumerator() => PreferredPosition.GetEnumerator();
