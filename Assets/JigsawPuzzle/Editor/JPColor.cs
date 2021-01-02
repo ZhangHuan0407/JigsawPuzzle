@@ -55,5 +55,11 @@
                 result = JPVector3.Zero;
             return result;
         }
+        public static float HDelta(JPColor one, JPColor another)
+        {
+            float ratio = one.A * another.A;
+            float delta = (one.H - another.H) * ratio;
+            return delta > 0 ? delta : -delta;
+        }
     }
 }

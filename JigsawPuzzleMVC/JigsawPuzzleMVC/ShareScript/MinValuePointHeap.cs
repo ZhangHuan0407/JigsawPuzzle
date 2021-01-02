@@ -83,5 +83,13 @@ namespace JigsawPuzzle
             PositionList.CopyTo(copy, 0);
             return copy;
         }
+        internal Point[] GetPoints()
+        {
+            Point[] copy = new Point[PositionList.Count];
+            int index = 0;
+            foreach ((Point, float) position in PositionList)
+                copy[index++] = position.Item1;
+            return copy;
+        }
     }
 }

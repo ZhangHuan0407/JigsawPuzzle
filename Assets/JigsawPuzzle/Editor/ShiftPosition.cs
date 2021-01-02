@@ -12,8 +12,8 @@ namespace JigsawPuzzle
             {
                 { ShiftPositionPropensity.LineByLine,    LineByLine },
                 { ShiftPositionPropensity.Tween,         Tween },
+                { ShiftPositionPropensity.Interval2,     Interval2 },
                 { ShiftPositionPropensity.Interval3,     Interval3 },
-                { ShiftPositionPropensity.Interval9,     Interval9 },
                 { ShiftPositionPropensity.Random16,      Random16 },
                 { ShiftPositionPropensity.Random64,      Random64 },
                 { ShiftPositionPropensity.Random256,     Random256 },
@@ -101,16 +101,16 @@ namespace JigsawPuzzle
                     yield return new Point(shiftX, shiftY);
         }
         /// <summary>
-        /// 8间隔，9偏移量移量
+        /// 1间隔，2偏移量移量
         /// <para>先移动x, 再移动y, 包含边界值</para>
         /// </summary>
         /// <param name="backgroundSize">后景尺寸</param>
         /// <param name="fontgroundSize">前景尺寸</param>
         /// <returns>偏移量</returns>
-        private static IEnumerable<Point> Interval9(Point backgroundSize, Point fontgroundSize)
+        private static IEnumerable<Point> Interval2(Point backgroundSize, Point fontgroundSize)
         {
-            for (int shiftY = 0; shiftY <= backgroundSize.Y - fontgroundSize.Y; shiftY += 9)
-                for (int shiftX = 0; shiftX <= backgroundSize.X - fontgroundSize.X; shiftX += 9)
+            for (int shiftY = 0; shiftY <= backgroundSize.Y - fontgroundSize.Y; shiftY += 2)
+                for (int shiftX = 0; shiftX <= backgroundSize.X - fontgroundSize.X; shiftX += 2)
                     yield return new Point(shiftX, shiftY);
         }
         /// <summary>
@@ -159,66 +159,59 @@ namespace JigsawPuzzle
                 yield return new Point(random.Next(0, deltaX), random.Next(0, deltaY));
         }
 
-        //public static IEnumerable<Point> EnumItNearly(
-        //    Point backgroundSize, Point fontgroundSize,
-        //    Point position, int maxDistance = 1)
-        //{
-        //    int minDeltaX, maxDeltaX;
-        //    if (position.X - maxDistance > 0)
-        //        minDeltaX = position.X - maxDistance;
-        //    else
-        //        minDeltaX = 0;
-        //    if (backgroundSize.X - fontgroundSize.X > position.X + maxDistance)
-        //        maxDeltaX = position.X + maxDistance;
-        //    else
-        //        maxDeltaX = backgroundSize.X - fontgroundSize.X;
-
-        //    int minDeltaY, maxDeltaY;
-        //    if (position.X - maxDistance > 0)
-        //        minDeltaY = position.Y - maxDistance;
-        //    else
-        //        minDeltaY = 0;
-        //    if (backgroundSize.Y - fontgroundSize.Y > position.Y + maxDistance)
-        //        maxDeltaY = position.Y + maxDistance;
-        //    else
-        //        maxDeltaY = backgroundSize.Y - fontgroundSize.Y;
-
-        //    // 我曾经写过一次螺旋线遍历，用的是四条斜线
-        //    // 那次经历给我留下痛苦的回忆，所以我选择更费电的写法
-        //    for (int shiftY = minDeltaY; shiftY <= maxDeltaY; shiftY++)
-        //        for (int shiftX = minDeltaX; shiftX <= maxDeltaX; shiftX++)
-        //        {
-        //            Point targetPosition = new Point(shiftX, shiftY);
-        //            if (NearlyButNotEqual(targetPosition))
-        //                yield return targetPosition;
-        //        }
-
-        //    bool NearlyButNotEqual(Point targetPosition)
-        //    {
-        //        int distanceX = targetPosition.X - position.X;
-        //        int distanceY = targetPosition.Y - position.Y;
-        //        distanceX = distanceX > 0 ? distanceX : -distanceX;
-        //        distanceY = distanceY > 0 ? distanceY : -distanceY;
-        //        int distance = distanceX + distanceY;
-        //        if (distance > maxDistance)
-        //            return false;
-        //        else if (distance == 0)
-        //            return false;
-        //        else
-        //            return true;
-        //    }
-        //}
-        
         public static IEnumerable<Point> EnumItNearly(
             Point backgroundSize, Point fontgroundSize,
             Point position, int maxDistance = 1)
         {
             if (maxDistance < 1)
+            {
+                yield return position;
                 yield break;
-            throw new NotImplementedException();
+            }
+            int minDeltaX, maxDeltaX;
+            if (position.X - maxDistance > 0)
+                minDeltaX = position.X - maxDistance;
+            else
+                minDeltaX = 0;
+            if (backgroundSize.X - fontgroundSize.X >= position.X + maxDistance)
+                maxDeltaX = position.X + maxDistance;
+            else
+                maxDeltaX = backgroundSize.X - fontgroundSize.X;
 
+            int minDeltaY, maxDeltaY;
+            if (position.Y - maxDistance > 0)
+                minDeltaY = position.Y - maxDistance;
+            else
+                minDeltaY = 0;
+            if (backgroundSize.Y - fontgroundSize.Y >= position.Y + maxDistance)
+                maxDeltaY = position.Y + maxDistance;
+            else
+                maxDeltaY = backgroundSize.Y - fontgroundSize.Y;
 
+            // 我曾经写过一次螺旋线遍历，用的是四条斜线
+            // 那次经历给我留下痛苦的回忆，所以我选择更费电的写法
+            for (int shiftY = minDeltaY; shiftY <= maxDeltaY; shiftY++)
+                for (int shiftX = minDeltaX; shiftX <= maxDeltaX; shiftX++)
+                {
+                    Point targetPosition = new Point(shiftX, shiftY);
+                    if (NearlyButNotEqual(targetPosition))
+                        yield return targetPosition;
+                }
 
+            bool NearlyButNotEqual(Point targetPosition)
+            {
+                int distanceX = targetPosition.X - position.X;
+                int distanceY = targetPosition.Y - position.Y;
+                distanceX = distanceX > 0 ? distanceX : -distanceX;
+                distanceY = distanceY > 0 ? distanceY : -distanceY;
+                int distance = distanceX + distanceY;
+                if (distance > maxDistance)
+                    return false;
+                else if (distance == 0)
+                    return false;
+                else
+                    return true;
+            }
         }
     }
 }

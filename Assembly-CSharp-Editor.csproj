@@ -81,10 +81,10 @@
     <Compile Include="Assets\JigsawPuzzle\Editor\MinValuePointHeap.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\Obsolete\JigsawPuzzleArguments.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\Obsolete\JigsawPuzzleEffectInspector.cs" />
+    <Compile Include="Assets\JigsawPuzzle\Editor\Obsolete\RGBASpriteMatch.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\Obsolete\SpriteCopy.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\Obsolete\SpriteMatch.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\Point.cs" />
-    <Compile Include="Assets\JigsawPuzzle\Editor\RGBASpriteMatch.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\ServerRouteConfig.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\ShareScriptAttribute.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\ShiftPosition.cs" />
