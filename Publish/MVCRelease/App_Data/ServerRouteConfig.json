@@ -1,50 +1,68 @@
 ﻿{
-  "BaseAddress": "http://127.0.0.1/",
+  "BaseAddress": "localhost:44331",
   "WebAPI": [
-    //DashboardController
     {
       "Action": "GetDetailInfo",
       "Controller": "Dashboard",
+      "DebugOnly": false,
       "FormKeys": [],
       "FormValues": [],
-      "ReturnType": "JigsawPuzzle.Models.DashboardInfo",
+      "ReturnType": "System.String",
       "Type": "HttpGet"
     },
-
-    //ExplorerController
     {
       "Action": "GetFileMapJson",
       "Controller": "Explorer",
+      "DebugOnly": false,
       "FormKeys": [],
       "FormValues": [],
-      "ReturnType": "System.Collections.Generic.Dictionary<string, string[]>",
+      "ReturnType": "JigsawPuzzle.JPFileMap",
       "Type": "HttpGet"
     },
     {
       "Action": "SelectFiles",
       "Controller": "Explorer",
+      "DebugOnly": false,
       "FormKeys": [ "File" ],
       "FormValues": [ "System.String[]" ],
       "ReturnType": "System.String",
       "Type": "HttpPost"
     },
-
-    //TaskController
+    {
+      "Action": "UploadFiles",
+      "Controller": "Explorer",
+      "DebugOnly": false,
+      "FormKeys": [],
+      "FormValues": [],
+      "ReturnType": "System.String",
+      "Type": "HttpPost"
+    },
+    {
+      "Action": "DownloadFile",
+      "Controller": "Explorer",
+      "DebugOnly": false,
+      "FormKeys": [],
+      "FormValues": [],
+      "ReturnType": "",
+      "Type": "HttpPost"
+    },
     {
       "Action": "StartNew",
       "Controller": "Task",
+      "DebugOnly": false,
       "FormKeys": [],
       "FormValues": [],
       "ReturnType": "System.String",
       "Type": "HttpGet"
     },
     {
-      "Action": "CreateNewData",
-      "Controller": "Task",
-      "FormKeys": [ "Name", "InfoData", "BinData" ],
-      "FormValues": [ "System.String", "JigsawPuzzleInfoData", "System.Byte[]" ],
-      "ReturnType": "System.String",
-      "Type": "HttpPost"
+      "Action": "RebuildServerRouteConfig",
+      "Controller": "UnitTest",
+      "DebugOnly": true,
+      "FormKeys": [],
+      "FormValues": [],
+      "ReturnType": "",
+      "Type": "HttpGet"
     }
   ]
 }

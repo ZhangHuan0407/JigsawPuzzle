@@ -165,7 +165,6 @@ namespace JigsawPuzzle
                         {
                             foreach (HttpContent content in converter(obj))
                                 form.Add(content, itemName);
-                            goto PostMessage;
                         }
 
                         Type objType = obj.GetType();
@@ -176,10 +175,8 @@ namespace JigsawPuzzle
                         {
                             string content = JsonFuck.FromObjectToJson(obj);
                             form.Add(new StringContent(content), itemName);
-                            goto PostMessage;
                         }
                     }
-                PostMessage:
                     responseMessage = Client.PostAsync($"{controller}/{action}", form);
 
                     responseMessage.Wait();

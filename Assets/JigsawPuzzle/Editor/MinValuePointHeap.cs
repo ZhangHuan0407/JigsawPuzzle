@@ -26,12 +26,13 @@ namespace JigsawPuzzle
         public float Limit { get; private set; }
 
         /* ctor */
-        public MinValuePointHeap(int capacity)
+        public MinValuePointHeap(int capacity, float limitDefault)
         {
             if (capacity < 1)
                 throw new ArgumentException(nameof(capacity));
 
             Capacity = capacity;
+            Limit = limitDefault;
             PositionList = new LinkedList<(Point, float)>();
         }
 
@@ -45,7 +46,7 @@ namespace JigsawPuzzle
         public virtual void AddMinItem(Point position, float value)
         {
             LinkedListNode<(Point, float)> node = PositionList.First;
-            if (value > Limit)
+            if (value >= Limit)
                 return;
             else if (PositionList.Count == 0)
             {
@@ -75,6 +76,7 @@ namespace JigsawPuzzle
             }
             if (PositionList.Count > Capacity)
                 PositionList.RemoveFirst();
+            Limit = PositionList.First.Value.Item2;
         }
 
         internal (Point, float)[] ToArray()

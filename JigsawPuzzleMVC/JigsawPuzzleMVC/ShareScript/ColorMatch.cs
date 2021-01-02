@@ -18,7 +18,7 @@ namespace JigsawPuzzle
         public ShiftPositionPropensity Propensity { get; protected set; }
         public JPColor[,] SpriteColor { get; protected set; }
         public Point[] EffectiveArea { get; protected set; }
-#if DEBUG && MVC
+#if DEBUG && MVC && !PARALLELMODE
         public Analysis.Log Log;
 #endif
 
@@ -70,7 +70,7 @@ namespace JigsawPuzzle
                 if (ValueMapIsBetter(valueMap, out AverageValue averageValue))
                     PreferredPosition.Add((point, averageValue));
             }
-#if DEBUG && MVC
+#if DEBUG && MVC && !PARALLELMODE
             System.Text.StringBuilder builder = new System.Text.StringBuilder();
             foreach ((Point, AverageValue) point in PreferredPosition)
                 builder.AppendLine($"{point.Item1} {point.Item2}");

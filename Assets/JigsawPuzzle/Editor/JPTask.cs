@@ -1,6 +1,4 @@
-﻿//#define PARALLELMODE
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -116,7 +114,8 @@ namespace JigsawPuzzle
                 spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Interval2;
                 spriteInfo.Propensity = ShiftPositionPropensity.LineByLine;
                 spriteInfo.AccurateDistance = 0;
-                spriteInfo.PreferredPosHeap = new MinValuePointHeap(20);
+                spriteInfo.PreferredPosHeap = new MinValuePointHeap(20, JPHColorMatch.DefaultMaxDelta);
+                spriteInfo.MaxSqrMagnitude = JPRGBAColorMatch.DefaultMaxSqrMagnitude;
             }
 
             JPColor[,] effectSpriteColor = SpriteColor[EffectSpriteInfo];
@@ -128,29 +127,24 @@ namespace JigsawPuzzle
             {
 #endif
                 if (spriteInfo.PretreatmentPropensity == ShiftPositionPropensity.None)
-                {
-                    spriteInfo.MaxSqrMagnitude = JPRGBAColorMatch.DefaultMaxSqrMagnitude;
                     return;
-                }
 
                 JPHColorMatch match = new JPHColorMatch(
                     effectSpriteColor,
                     SpriteColor[spriteInfo],
                     spriteInfo.PretreatmentPropensity);
-#if DEBUG && MVC
+#if DEBUG && MVC && !PARALLELMODE
                 match.Log = Log;
 #endif
                 match.TryGetPreferredPosition();
-                Point preferredPosition = Point.Zero;
-                float minDelta = 1f;
                 foreach ((Point, float) capture in match)
-                    if (capture.Item2 < minDelta)
-                    {
-                        minDelta = capture.Item2;
-                        preferredPosition = capture.Item1;
-                    }
-                spriteInfo.PreferredPosHeap.AddMinItem(preferredPosition, minDelta);
-                spriteInfo.MaxSqrMagnitude = minDelta * minDelta * 3 + 0.01f;
+                    spriteInfo.PreferredPosHeap.AddMinItem(capture.Item1, capture.Item2);
+#if DEBUG && MVC && !PARALLELMODE
+                StringBuilder builder = new StringBuilder();
+                foreach ((Point, float) point in spriteInfo.PreferredPosHeap.ToArray())
+                    builder.AppendLine($"{point.Item1}, {point.Item2}");
+                Log.WriteData(null, "Pretreatment spriteInfo.PreferredPosHeap : ", builder.ToString());
+#endif
 #if PARALLELMODE
             });
 #else
@@ -167,6 +161,7 @@ namespace JigsawPuzzle
                     return;
 
                 (Point, float)[] preferredPositions = spriteInfo.PreferredPosHeap.ToArray();
+                spriteInfo.PreferredPosHeap = new MinValuePointHeap(10, JPRGBAColorMatch.DefaultMaxSqrMagnitude);
                 foreach ((Point, float) position in preferredPositions)
                 {
                     JPRGBAColorMatch accurateMatch = new JPRGBAColorMatch(
@@ -174,6 +169,9 @@ namespace JigsawPuzzle
                     SpriteColor[spriteInfo],
                     ShiftPositionPropensity.None,
                     position.Item2);
+#if DEBUG && MVC && !PARALLELMODE
+                    accurateMatch.Log = Log;
+#endif
                     accurateMatch.TryGetNearlyPreferredPosition(position.Item1, spriteInfo.AccurateDistance);
                     (Point, float) bestPosition = accurateMatch.BestOne();
                     spriteInfo.PreferredPosHeap.AddMinItem(bestPosition.Item1, bestPosition.Item2);
@@ -203,6 +201,9 @@ namespace JigsawPuzzle
             string contents = JsonFuck.FromObjectToJson(JPInfoData);
             File.WriteAllText(InfoDataFile.FullName, contents);
             Builder.AppendLine($"Finish {nameof(WriteOutResult)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
+#if DEBUG && MVC
+            Log.WriteOut();
+#endif
         }
 
         internal static void StartRemoteTask(JPTaskConnector connector, string[] filesName)
