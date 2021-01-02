@@ -51,8 +51,6 @@ namespace JigsawPuzzle
                     buffer[startIndex++] = (byte)(color.b * 255);
                     buffer[startIndex++] = (byte)(color.a * 255);
                     buffer[startIndex++] = (byte)(h * 255);
-                    buffer[startIndex++] = (byte)(s * 255);
-                    buffer[startIndex++] = (byte)(v * 255);
                 }
             Stream.Write(buffer, 0, buffer.Length);
         }

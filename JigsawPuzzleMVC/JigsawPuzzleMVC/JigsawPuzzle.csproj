@@ -136,9 +136,9 @@
     <Compile Include="Models\FileList.cs" />
     <Compile Include="Models\PortConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ShareScript\ColorMatch.cs" />
     <Compile Include="ShareScript\ControllerAction.cs" />
     <Compile Include="ShareScript\HttpContentConverter.cs" />
+    <Compile Include="ShareScript\JPColorMatch.cs" />
     <Compile Include="ShareScript\JPFileMap.cs" />
     <Compile Include="ShareScript\JPHColorMatch.cs" />
     <Compile Include="ShareScript\JPRGBAColorMatch.cs" />

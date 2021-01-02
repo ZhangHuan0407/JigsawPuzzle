@@ -3,7 +3,7 @@
 namespace JigsawPuzzle
 {
     [ShareScript]
-    public class JPHColorMatch : ColorMatch<float, float>
+    public class JPHColorMatch : JPColorMatch<float, float>
     {
         /* const */
         public const float DefaultMaxDelta = 0.04f;
@@ -27,7 +27,7 @@ namespace JigsawPuzzle
         /* func */
         protected override float GetDeltaValue(JPColor effectColor, JPColor spriteColor) =>
             JPColor.HDelta(effectColor, spriteColor);
-        protected override bool ValueMapIsBetter(float[,] valueMap, out float averageValue)
+        protected override bool ValueMapIsBetter(float[,] valueMap, out float averageDeltaValue)
         {
             float TotalMaxDelta = EffectiveArea.Length * MaxDelta;
             float value = 0f;
@@ -38,7 +38,7 @@ namespace JigsawPuzzle
             }
             if (value > TotalMaxDelta)
             {
-                averageValue = MaxDelta;
+                averageDeltaValue = MaxDelta;
                 return false;
             }
             for (int indedx = EffectiveArea.Length / 3; indedx < EffectiveArea.Length; indedx++)
@@ -46,22 +46,8 @@ namespace JigsawPuzzle
                 Point selectPoint = EffectiveArea[indedx];
                 value += valueMap[selectPoint.X, selectPoint.Y];
             }
-            averageValue = value / EffectiveArea.Length;
+            averageDeltaValue = value / EffectiveArea.Length;
             return value < TotalMaxDelta;
         }
-
-        public override WeightedPoint BestOne()
-        {
-            Point bestPoint = Point.Zero;
-            float minValue = 1f;
-            foreach ((Point, float) position in PreferredPosition)
-                if (position.Item2 < minValue)
-                {
-                    bestPoint = position.Item1;
-                    minValue = position.Item2;
-                }
-            return new WeightedPoint(bestPoint, minValue);
-        }
-
     }
 }

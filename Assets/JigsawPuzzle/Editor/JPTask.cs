@@ -137,8 +137,8 @@ namespace JigsawPuzzle
                 match.Log = Log;
 #endif
                 match.TryGetPreferredPosition();
-                foreach ((Point, float) capture in match)
-                    spriteInfo.PreferredPosHeap.AddMinItem(new WeightedPoint(capture.Item1, capture.Item2));
+                foreach (WeightedPoint weightedPoint in match)
+                    spriteInfo.PreferredPosHeap.AddMinItem(weightedPoint);
 #if DEBUG && MVC && !PARALLELMODE
                 StringBuilder builder = new StringBuilder();
                 foreach ((Point, float) point in spriteInfo.PreferredPosHeap.ToArray())
@@ -173,8 +173,8 @@ namespace JigsawPuzzle
                     accurateMatch.Log = Log;
 #endif
                     accurateMatch.TryGetNearlyPreferredPosition(weightPoint.Position, spriteInfo.AccurateDistance);
-                    WeightedPoint bestPosition = accurateMatch.BestOne();
-                    spriteInfo.PreferredPosHeap.AddMinItem(bestPosition);
+                    if (accurateMatch.BestOne() is WeightedPoint bestPosition)
+                        spriteInfo.PreferredPosHeap.AddMinItem(bestPosition);
                 }
                 spriteInfo.PreferredPositions = spriteInfo.PreferredPosHeap.ToArray();
             });

@@ -6,7 +6,7 @@ using System.Linq;
 namespace JigsawPuzzle
 {
     [ShareScript]
-    public abstract class ColorMatch<Value, AverageValue> : IEnumerable<(Point, AverageValue)> where Value : new()
+    public abstract class JPColorMatch<Value, AverageValue> : IEnumerable<WeightedPoint> where Value : new()
     {
         /* const */
         public const int ZipCount = 500;
@@ -14,7 +14,7 @@ namespace JigsawPuzzle
         /* field */
         public Point CenterPosition { get; protected set; }
         public JPColor[,] EffectSpriteColor { get; protected set; }
-        public List<(Point, AverageValue)> PreferredPosition { get; protected set; }
+        public List<WeightedPoint> PreferredPosition { get; protected set; }
         public ShiftPositionPropensity Propensity { get; protected set; }
         public JPColor[,] SpriteColor { get; protected set; }
         public Point[] EffectiveArea { get; protected set; }
@@ -27,9 +27,9 @@ namespace JigsawPuzzle
         public Point SpriteColorSize => new Point(SpriteColor.GetLength(0), SpriteColor.GetLength(1));
 
         /* ctor */
-        protected ColorMatch()
+        protected JPColorMatch()
         {
-            PreferredPosition = new List<(Point, AverageValue)>();
+            PreferredPosition = new List<WeightedPoint>();
         }
 
         /* func */
@@ -67,8 +67,8 @@ namespace JigsawPuzzle
                     }
                 }
 
-                if (ValueMapIsBetter(valueMap, out AverageValue averageValue))
-                    PreferredPosition.Add((point, averageValue));
+                if (ValueMapIsBetter(valueMap, out float averageValue))
+                    PreferredPosition.Add(new WeightedPoint(point, averageValue));
             }
 #if DEBUG && MVC && !PARALLELMODE
             System.Text.StringBuilder builder = new System.Text.StringBuilder();
@@ -100,7 +100,7 @@ namespace JigsawPuzzle
 
         protected virtual IEnumerable<Point> GetShiftPosition() => ShiftPosition.EnumIt(EffectSpriteColorSize, SpriteColorSize, Propensity);
         protected abstract Value GetDeltaValue(JPColor effectColor, JPColor spriteColor);
-        protected abstract bool ValueMapIsBetter(Value[,] valueMap, out AverageValue averageValue);
+        protected abstract bool ValueMapIsBetter(Value[,] valueMap, out float averageDeltaValue);
 
         public virtual void TryGetNearlyPreferredPosition(Point position, int distance)
         {
@@ -120,15 +120,31 @@ namespace JigsawPuzzle
                     GetDeltaValue(effectColor, spriteColor);
                 }
 
-                if (ValueMapIsBetter(valueMap, out AverageValue averageValue))
-                    PreferredPosition.Add((point, averageValue));
+                if (ValueMapIsBetter(valueMap, out float averageValue))
+                    PreferredPosition.Add(new WeightedPoint(point, averageValue));
             }
         }
 
-        public abstract WeightedPoint BestOne();
+        public virtual WeightedPoint BestOne()
+        {
+            if (PreferredPosition.Count == 0)
+                return null;
+            int index = 0;
+            float minValue = PreferredPosition[0].Value;
+            for (int i = 1; i < PreferredPosition.Count; i++)
+            {
+                WeightedPoint position = PreferredPosition[i];
+                if (position.Value < minValue)
+                {
+                    index = i;
+                    minValue = position.Value;
+                }
+            }
+            return PreferredPosition[index];
+        }
 
         /* IEnumerable */
-        public IEnumerator<(Point, AverageValue)> GetEnumerator() => PreferredPosition.GetEnumerator();
+        public IEnumerator<WeightedPoint> GetEnumerator() => PreferredPosition.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
