@@ -29,16 +29,30 @@ namespace JigsawPuzzle
             JPColor.RGBADelta(effectColor, spriteColor).SqrMagnitude;
         protected override bool ValueMapIsBetter(float[,] valueMap, out float averageValue)
         {
+            float TotalMaxDelta = EffectiveArea.Length * MaxSqrMagnitude;
             float value = 0f;
-            foreach (float add in valueMap)
-                value += add;
+            for (int indedx = 0; indedx < EffectiveArea.Length / 3; indedx++)
+            {
+                Point selectPoint = EffectiveArea[indedx];
+                value += valueMap[selectPoint.X, selectPoint.Y];
+            }
+            if (value > TotalMaxDelta)
+            {
+                averageValue = MaxSqrMagnitude;
+                return false;
+            }
+            for (int indedx = EffectiveArea.Length / 3; indedx < EffectiveArea.Length; indedx++)
+            {
+                Point selectPoint = EffectiveArea[indedx];
+                value += valueMap[selectPoint.X, selectPoint.Y];
+            }
             averageValue = value / valueMap.Length;
-            return averageValue < MaxSqrMagnitude;
+            return value < TotalMaxDelta;
         }
 
         public override (Point, float) BestOne()
         {
-            Point bestPoint = new Point();
+            Point bestPoint = Point.Zero;
             float minValue = 1f;
             foreach ((Point, float) position in PreferredPosition)
                 if (position.Item2 < minValue)

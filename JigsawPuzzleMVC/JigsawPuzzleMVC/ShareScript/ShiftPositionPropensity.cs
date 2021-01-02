@@ -22,13 +22,13 @@ namespace JigsawPuzzle
         /// </summary>
         Tween = 0x0010,
         /// <summary>
+        /// 1间隔，2偏移量移量
+        /// </summary>
+        Interval2 = 0x0100,
+        /// <summary>
         /// 2间隔，3偏移量枚举
         /// </summary>
-        Interval3 = 0x0100,
-        /// <summary>
-        /// 8间隔，9偏移量移量
-        /// </summary>
-        Interval9 = 0x0200,
+        Interval3 = 0x0200,
         /// <summary>
         /// 16次随机枚举偏移量
         /// </summary>

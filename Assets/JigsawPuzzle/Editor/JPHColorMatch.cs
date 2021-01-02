@@ -3,33 +3,33 @@
 namespace JigsawPuzzle
 {
     [ShareScript]
-    public class JPRGBAColorMatch : ColorMatch<float, float>
+    public class JPHColorMatch : ColorMatch<float, float>
     {
         /* const */
-        public const float DefaultMaxSqrMagnitude = 0.03f;
+        public const float DefaultMaxDelta = 0.1f;
 
         /* field */
-        public float MaxSqrMagnitude;
-        
+        public float MaxDelta;
+
         /* ctor */
-        public JPRGBAColorMatch(
-            JPColor[,] effectSpriteColor, 
-            JPColor[,] spriteColor, 
+        public JPHColorMatch(
+            JPColor[,] effectSpriteColor,
+            JPColor[,] spriteColor,
             ShiftPositionPropensity propensity,
-            float maxSqrMagnitude) : base()
+            float maxDelta = DefaultMaxDelta) : base()
         {
             EffectSpriteColor = effectSpriteColor ?? throw new NullReferenceException(nameof(effectSpriteColor));
             SpriteColor = spriteColor ?? throw new NullReferenceException(nameof(spriteColor));
             Propensity = propensity;
-            MaxSqrMagnitude = maxSqrMagnitude;
+            MaxDelta = maxDelta;
         }
 
         /* func */
         protected override float GetDeltaValue(JPColor effectColor, JPColor spriteColor) =>
-            JPColor.RGBADelta(effectColor, spriteColor).SqrMagnitude;
+            JPColor.HDelta(effectColor, spriteColor);
         protected override bool ValueMapIsBetter(float[,] valueMap, out float averageValue)
         {
-            float TotalMaxDelta = EffectiveArea.Length * MaxSqrMagnitude;
+            float TotalMaxDelta = EffectiveArea.Length * MaxDelta;
             float value = 0f;
             for (int indedx = 0; indedx < EffectiveArea.Length / 3; indedx++)
             {
@@ -38,7 +38,7 @@ namespace JigsawPuzzle
             }
             if (value > TotalMaxDelta)
             {
-                averageValue = MaxSqrMagnitude;
+                averageValue = MaxDelta;
                 return false;
             }
             for (int indedx = EffectiveArea.Length / 3; indedx < EffectiveArea.Length; indedx++)
@@ -46,7 +46,7 @@ namespace JigsawPuzzle
                 Point selectPoint = EffectiveArea[indedx];
                 value += valueMap[selectPoint.X, selectPoint.Y];
             }
-            averageValue = value / valueMap.Length;
+            averageValue = value / EffectiveArea.Length;
             return value < TotalMaxDelta;
         }
 
@@ -62,5 +62,6 @@ namespace JigsawPuzzle
                 }
             return (bestPoint, minValue);
         }
+
     }
 }
