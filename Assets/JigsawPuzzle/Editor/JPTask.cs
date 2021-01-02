@@ -113,7 +113,7 @@ namespace JigsawPuzzle
 
                 spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Interval2;
                 spriteInfo.Propensity = ShiftPositionPropensity.LineByLine;
-                spriteInfo.AccurateDistance = 0;
+                spriteInfo.AccurateDistance = 1;
                 spriteInfo.PreferredPosHeap = new MinValuePointHeap(20, JPHColorMatch.DefaultMaxDelta);
                 spriteInfo.MaxSqrMagnitude = JPRGBAColorMatch.DefaultMaxSqrMagnitude;
             }

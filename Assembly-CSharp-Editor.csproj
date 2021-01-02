@@ -80,11 +80,6 @@
     <Compile Include="Assets\JigsawPuzzle\Editor\JigsawPuzzleWindow.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\JsonFuck.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\MinValuePointHeap.cs" />
-    <Compile Include="Assets\JigsawPuzzle\Editor\Obsolete\JigsawPuzzleArguments.cs" />
-    <Compile Include="Assets\JigsawPuzzle\Editor\Obsolete\JigsawPuzzleEffectInspector.cs" />
-    <Compile Include="Assets\JigsawPuzzle\Editor\Obsolete\RGBASpriteMatch.cs" />
-    <Compile Include="Assets\JigsawPuzzle\Editor\Obsolete\SpriteCopy.cs" />
-    <Compile Include="Assets\JigsawPuzzle\Editor\Obsolete\SpriteMatch.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\Point.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\ServerRouteConfig.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\ShareScriptAttribute.cs" />
@@ -739,12 +734,7 @@
       <HintPath>A:/JigsawPuzzle/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{957ECA66-DBFC-F5DC-C2C8-25B481696BEA}</Project>
-      <Name>Assembly-CSharp</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup></ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
