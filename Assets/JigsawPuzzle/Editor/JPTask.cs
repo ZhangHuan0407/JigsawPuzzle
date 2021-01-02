@@ -39,11 +39,11 @@ namespace JigsawPuzzle
         {
             try
             {
+                InitParameter();
                 // 修改为直接在函数内报错
                 if (!TryReloadDataAncCheck())
                     throw new ArgumentException($"Throw Exception where invoke {nameof(JPTask)}.{nameof(TryReloadDataAncCheck)}");
 
-                InitParameter();
                 Pretreatment();
                 SpeculatePreferredPosition();
                 PredictLayout();
@@ -52,14 +52,15 @@ namespace JigsawPuzzle
             }
             catch (Exception e)
             {
-                Builder.AppendLine($"{nameof(DateTime)} : {DateTime.Now}")
+                Builder?.AppendLine($"{nameof(DateTime)} : {DateTime.Now}")
                     .AppendLine(e.Message)
                     .AppendLine(e.StackTrace);
             }
             finally
             {
                 SpriteColor?.Clear();
-                File.WriteAllText($"{InfoDataFile.FullName}.log", Builder.ToString());
+                if (Builder != null)
+                    File.WriteAllText($"{InfoDataFile.FullName}.log", Builder.ToString());
             }
         }
         private bool TryReloadDataAncCheck()
@@ -102,84 +103,49 @@ namespace JigsawPuzzle
             {
                 spriteInfo.TotalNumberOfPossibilities = (EffectSpriteInfo.Width - spriteInfo.Width + 1) * (EffectSpriteInfo.Height - spriteInfo.Height + 1);
 
-                int times = spriteInfo.TotalNumberOfPossibilities;
-                if (times > 900000)
-                {
-                    spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Random256;
-                    spriteInfo.Propensity = ShiftPositionPropensity.Interval9;
-                    spriteInfo.AccurateDistance = 4;
-                    spriteInfo.PreferredPositiosn = new MinValuePointHeap(10);
-                }
-                else if (times > 450000)
-                {
-                    spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Random64;
-                    spriteInfo.Propensity = ShiftPositionPropensity.Interval9;
-                    spriteInfo.AccurateDistance = 4;
-                    spriteInfo.PreferredPositiosn = new MinValuePointHeap(6);
-                }
-                else if (times > 100000)
-                {
-                    spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Random16;
-                    spriteInfo.Propensity = ShiftPositionPropensity.Interval3;
-                    spriteInfo.AccurateDistance = 1;
-                    spriteInfo.PreferredPositiosn = new MinValuePointHeap(4);
-                }
-                else
-                {
-                    spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.None;
-                    spriteInfo.Propensity = ShiftPositionPropensity.Interval3;
-                    spriteInfo.AccurateDistance = 1;
-                    spriteInfo.PreferredPositiosn = new MinValuePointHeap(2);
-                }
+                spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Interval3;
+                spriteInfo.Propensity = ShiftPositionPropensity.LineByLine;
+                spriteInfo.AccurateDistance = 0;
+                spriteInfo.PreferredPosHeap = new MinValuePointHeap(10);
             }
 
             JPColor[,] effectSpriteColor = SpriteColor[EffectSpriteInfo];
-            foreach (SpriteInfo spriteInfo in SpritesInfo)
+            ParallelLoopResult result = Parallel.ForEach(SpritesInfo, (SpriteInfo spriteInfo) =>
             {
                 if (spriteInfo.PretreatmentPropensity == ShiftPositionPropensity.None)
                 {
                     spriteInfo.MaxSqrMagnitude = JPRGBAColorMatch.DefaultMaxSqrMagnitude;
-                    continue;
+                    return;
                 }
 
-                JPRGBAColorMatch match = new JPRGBAColorMatch(
+                JPHColorMatch match = new JPHColorMatch(
                     effectSpriteColor,
                     SpriteColor[spriteInfo],
-                    spriteInfo.PretreatmentPropensity,
-                    JPRGBAColorMatch.DefaultMaxSqrMagnitude);
+                    spriteInfo.PretreatmentPropensity);
                 match.TryGetPreferredPosition();
-                Point preferredPosition = default;
-                float maxSqrMagnitude = 1f;
+                Point preferredPosition = Point.Zero;
+                float minDelta = 1f;
                 foreach ((Point, float) capture in match)
-                    if (capture.Item2 < maxSqrMagnitude)
+                    if (capture.Item2 < minDelta)
                     {
-                        maxSqrMagnitude = capture.Item2;
+                        minDelta = capture.Item2;
                         preferredPosition = capture.Item1;
                     }
-                spriteInfo.PreferredPositiosn.AddMinItem(preferredPosition, maxSqrMagnitude);
-                spriteInfo.MaxSqrMagnitude = maxSqrMagnitude;
-            }
+                spriteInfo.PreferredPosHeap.AddMinItem(preferredPosition, minDelta);
+                spriteInfo.MaxSqrMagnitude = minDelta * minDelta * 3 + 0.01f;
+            });
             Builder.AppendLine($"Finish {nameof(Pretreatment)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
         }
         private void SpeculatePreferredPosition()
         {
             JPColor[,] effectSpriteColor = SpriteColor[EffectSpriteInfo];
-            foreach (SpriteInfo spriteInfo in SpritesInfo)
+            ParallelLoopResult result = Parallel.ForEach(SpritesInfo, (SpriteInfo spriteInfo) =>
             {
                 if (spriteInfo.Propensity == ShiftPositionPropensity.None)
-                    throw new ArgumentException($"spriteInfo.Propensity is {spriteInfo.Propensity}.");
+                    return;
 
-                JPRGBAColorMatch match = new JPRGBAColorMatch(
-                    effectSpriteColor,
-                    SpriteColor[spriteInfo],
-                    spriteInfo.Propensity,
-                    spriteInfo.MaxSqrMagnitude);
-                match.TryGetPreferredPosition();
-                foreach ((Point, float) capture in match)
-                    spriteInfo.PreferredPositiosn.AddMinItem(capture.Item1, capture.Item2);
-
-                (Point, float)[] preferredPositiosn = spriteInfo.PreferredPositiosn.ToArray();
-                foreach ((Point, float) position in preferredPositiosn)
+                (Point, float)[] preferredPositions = spriteInfo.PreferredPosHeap.ToArray();
+                foreach ((Point, float) position in preferredPositions)
                 {
                     JPRGBAColorMatch accurateMatch = new JPRGBAColorMatch(
                     effectSpriteColor,
@@ -188,9 +154,10 @@ namespace JigsawPuzzle
                     position.Item2);
                     accurateMatch.TryGetNearlyPreferredPosition(position.Item1, spriteInfo.AccurateDistance);
                     (Point, float) bestPosition = accurateMatch.BestOne();
-                    spriteInfo.PreferredPositiosn.AddMinItem(bestPosition.Item1, bestPosition.Item2);
+                    spriteInfo.PreferredPosHeap.AddMinItem(bestPosition.Item1, bestPosition.Item2);
                 }
-            }
+                spriteInfo.PreferredPositions = spriteInfo.PreferredPosHeap.GetPoints();
+            });
             Builder.AppendLine($"Finish {nameof(SpeculatePreferredPosition)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
         }
         [Obsolete("当前此方法不具有实际功能")]
@@ -200,11 +167,12 @@ namespace JigsawPuzzle
         }
         private void FreeTemp()
         {
+            EffectSpriteInfo = null;
             SpriteColor.Clear();
             SpriteColor = null;
-            EffectSpriteInfo = null;
             SpritesInfo.Clear();
             SpritesInfo = null;
+            GC.Collect();
             Builder.AppendLine($"Finish {nameof(FreeTemp)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
         }
         private void WriteOutResult()
@@ -226,11 +194,15 @@ namespace JigsawPuzzle
                 new Dictionary<string, object>(){ { "File", filesName } },
                 (object selectFilesMessage) => 
                 {
+#if UNITY_EDITOR
                     UnityEngine.Debug.Log(selectFilesMessage);
+#endif
                     connector.Get("StartNew", "Task",
                         (object startNewMessage) =>
                         {
+#if UNITY_EDITOR
                             UnityEngine.Debug.Log(startNewMessage);
+#endif
                         });
                 });
         }
