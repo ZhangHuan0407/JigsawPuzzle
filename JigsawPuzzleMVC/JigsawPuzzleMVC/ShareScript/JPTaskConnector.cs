@@ -82,21 +82,18 @@ namespace JigsawPuzzle
             Task<HttpResponseMessage> responseMessage = Client.GetAsync($"{controller}/{action}");
             return Task.Run(() =>
             {
+                bool needCallback = false;
                 try
                 {
                     responseMessage.Wait();
+                    needCallback = true;
                     object resultObject = null;
                     if (!responseMessage.Result.IsSuccessStatusCode)
-                    {
-                        Action<HttpResponseMessage> copy = failed;
-                        failed = null;
-                        copy?.Invoke(responseMessage.Result);
-                        goto AfterCallback;
-                    }
+                        goto FailCallback;
                     else if (HttpContentConverter.HttpContentToObject.TryGetValue(controllerAction.ReturnType, out Func<HttpContent, object> converter))
                     {
                         resultObject = converter(responseMessage.Result.Content);
-                        goto BeforeCallback;
+                        goto SuccessCallback;
                     }
 
                     Type returnType = controllerAction.GetSerializedReturnType();
@@ -106,13 +103,21 @@ namespace JigsawPuzzle
                     {
                         string jsonResult = responseMessage.Result.Content.ReadAsStringAsync().Result;
                         resultObject = JsonFuck.FromJsonToObject(jsonResult, returnType);
-                        goto BeforeCallback;
+                        goto SuccessCallback;
                     }
 
-                BeforeCallback:
-                    success?.Invoke(resultObject);
-                AfterCallback:
-                    failed = null;
+                SuccessCallback:
+                    if (needCallback)
+                    {
+                        needCallback = false;
+                        success?.Invoke(resultObject);
+                    }
+                FailCallback:
+                    if (needCallback)
+                    {
+                        needCallback = false;
+                        failed?.Invoke(responseMessage.Result);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -125,7 +130,11 @@ namespace JigsawPuzzle
                 }
                 finally
                 {
-                    failed?.Invoke(responseMessage?.Result);
+                    if (needCallback)
+                    {
+                        needCallback = false;
+                        failed?.Invoke(responseMessage?.Result);
+                    }
                 }
             });
         }
@@ -150,6 +159,7 @@ namespace JigsawPuzzle
 
             Task.Run(() =>
             {
+                bool needCallback = false;
                 Task<HttpResponseMessage> responseMessage = null;
                 try
                 {
@@ -180,20 +190,15 @@ namespace JigsawPuzzle
                         }
                     }
                     responseMessage = Client.PostAsync($"{controller}/{action}", form);
-
                     responseMessage.Wait();
+                    needCallback = true;
                     object resultObject = null;
                     if (!responseMessage.Result.IsSuccessStatusCode)
-                    {
-                        Action<HttpResponseMessage> copy = failed;
-                        failed = null;
-                        copy?.Invoke(responseMessage.Result);
-                        goto AfterCallback;
-                    }
+                        goto FailCallback;
                     else if (HttpContentConverter.HttpContentToObject.TryGetValue(controllerAction.ReturnType, out Func<HttpContent, object> converter))
                     {
                         resultObject = converter(responseMessage.Result.Content);
-                        goto BeforeCallback;
+                        goto SuccessCallback;
                     }
 
                     Type returnType = controllerAction.GetSerializedReturnType();
@@ -203,13 +208,21 @@ namespace JigsawPuzzle
                     {
                         string jsonResult = responseMessage.Result.Content.ReadAsStringAsync().Result;
                         resultObject = JsonFuck.FromJsonToObject(jsonResult, returnType);
-                        goto BeforeCallback;
+                        goto SuccessCallback;
                     }
 
-                BeforeCallback:
-                    success?.Invoke(resultObject);
-                AfterCallback:
-                    failed = null;
+                SuccessCallback:
+                    if (needCallback)
+                    {
+                        needCallback = false;
+                        success?.Invoke(resultObject);
+                    }
+                FailCallback:
+                    if (needCallback)
+                    {
+                        needCallback = false;
+                        failed?.Invoke(responseMessage.Result);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -222,7 +235,11 @@ namespace JigsawPuzzle
                 }
                 finally
                 {
-                    failed?.Invoke(responseMessage?.Result);
+                    if (needCallback)
+                    {
+                        needCallback = false;
+                        failed?.Invoke(responseMessage?.Result);
+                    }
                 }
             });
         }
@@ -239,6 +256,7 @@ namespace JigsawPuzzle
 
             Task.Run(() =>
             {
+                bool needCallback = false;
                 Task<HttpResponseMessage> responseMessage = null;
                 try
                 {
@@ -248,18 +266,14 @@ namespace JigsawPuzzle
                     };
                     responseMessage = Client.PostAsync($"{controller}/{action}", form);
                     responseMessage.Wait();
+                    needCallback = true;
                     object resultObject = null;
                     if (!responseMessage.Result.IsSuccessStatusCode)
-                    {
-                        Action<HttpResponseMessage> copy = failed;
-                        failed = null;
-                        copy?.Invoke(responseMessage.Result);
-                        goto AfterCallback;
-                    }
+                        goto FailCallback;
                     else if (HttpContentConverter.HttpContentToObject.TryGetValue(controllerAction.ReturnType, out Func<HttpContent, object> converter))
                     {
                         resultObject = converter(responseMessage.Result.Content);
-                        goto BeforeCallback;
+                        goto SuccessCallback;
                     }
 
                     Type returnType = controllerAction.GetSerializedReturnType();
@@ -269,13 +283,21 @@ namespace JigsawPuzzle
                     {
                         string jsonResult = responseMessage.Result.Content.ReadAsStringAsync().Result;
                         resultObject = JsonFuck.FromJsonToObject(jsonResult, returnType);
-                        goto BeforeCallback;
+                        goto SuccessCallback;
                     }
 
-                BeforeCallback:
-                    success?.Invoke(resultObject);
-                AfterCallback:
-                    failed = null;
+                SuccessCallback:
+                    if (needCallback)
+                    {
+                        needCallback = false;
+                        success?.Invoke(resultObject);
+                    }
+                FailCallback:
+                    if (needCallback)
+                    {
+                        needCallback = false;
+                        failed?.Invoke(responseMessage.Result);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -288,7 +310,11 @@ namespace JigsawPuzzle
                 }
                 finally
                 {
-                    failed?.Invoke(responseMessage?.Result);
+                    if (needCallback)
+                    {
+                        needCallback = false;
+                        failed?.Invoke(responseMessage?.Result);
+                    }
                 }
             });
         }
