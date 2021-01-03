@@ -15,8 +15,8 @@ namespace JigsawPuzzle
                 { ShiftPositionPropensity.Interval2,     Interval2 },
                 { ShiftPositionPropensity.Interval3,     Interval3 },
                 { ShiftPositionPropensity.Random16,      Random16 },
-                { ShiftPositionPropensity.Random64,      Random64 },
                 { ShiftPositionPropensity.Random256,     Random256 },
+                { ShiftPositionPropensity.Random512,     Random512 },
             };
 
         /* func */
@@ -129,21 +129,6 @@ namespace JigsawPuzzle
                 yield return new Point(random.Next(0, deltaX), random.Next(0, deltaY));
         }
         /// <summary>
-        /// 64次随机枚举偏移量
-        /// <para>包含边界值</para>
-        /// </summary>
-        /// <param name="backgroundSize">后景尺寸</param>
-        /// <param name="fontgroundSize">前景尺寸</param>
-        /// <returns>偏移量</returns>
-        private static IEnumerable<Point> Random64(Point backgroundSize, Point fontgroundSize)
-        {
-            Random random = new Random();
-            int deltaX = backgroundSize.X - fontgroundSize.X + 1;
-            int deltaY = backgroundSize.Y - fontgroundSize.Y + 1;
-            for (int i = 0; i < 64; i++)
-                yield return new Point(random.Next(0, deltaX), random.Next(0, deltaY));
-        }
-        /// <summary>
         /// 256次随机枚举偏移量
         /// <para>包含边界值</para>
         /// </summary>
@@ -156,6 +141,21 @@ namespace JigsawPuzzle
             int deltaX = backgroundSize.X - fontgroundSize.X + 1;
             int deltaY = backgroundSize.Y - fontgroundSize.Y + 1;
             for (int i = 0; i < 256; i++)
+                yield return new Point(random.Next(0, deltaX), random.Next(0, deltaY));
+        }
+        /// <summary>
+        /// 512次随机枚举偏移量
+        /// <para>包含边界值</para>
+        /// </summary>
+        /// <param name="backgroundSize">后景尺寸</param>
+        /// <param name="fontgroundSize">前景尺寸</param>
+        /// <returns>偏移量</returns>
+        private static IEnumerable<Point> Random512(Point backgroundSize, Point fontgroundSize)
+        {
+            Random random = new Random();
+            int deltaX = backgroundSize.X - fontgroundSize.X + 1;
+            int deltaY = backgroundSize.Y - fontgroundSize.Y + 1;
+            for (int i = 0; i < 512; i++)
                 yield return new Point(random.Next(0, deltaX), random.Next(0, deltaY));
         }
 

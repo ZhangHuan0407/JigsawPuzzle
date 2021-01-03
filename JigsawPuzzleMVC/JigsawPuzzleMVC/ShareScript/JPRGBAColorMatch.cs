@@ -6,22 +6,20 @@ namespace JigsawPuzzle
     public class JPRGBAColorMatch : JPColorMatch<float, float>
     {
         /* const */
-        public const float DefaultMaxSqrMagnitude = 0.03f;
+        public const float DefaultMaxSqrMagnitude = 0.5f;
 
-        /* field */
-        public float MaxSqrMagnitude;
-        
         /* ctor */
         public JPRGBAColorMatch(
-            JPColor[,] effectSpriteColor, 
-            JPColor[,] spriteColor, 
+            JPColor[,] effectSpriteColor,
+            JPColor[,] spriteColor,
             ShiftPositionPropensity propensity,
-            float maxSqrMagnitude) : base()
+            WeightedPoint[] preferredPositions = null) : base()
         {
             EffectSpriteColor = effectSpriteColor ?? throw new NullReferenceException(nameof(effectSpriteColor));
             SpriteColor = spriteColor ?? throw new NullReferenceException(nameof(spriteColor));
             Propensity = propensity;
-            MaxSqrMagnitude = maxSqrMagnitude;
+            if (preferredPositions != null)
+                PreferredPosition.AddRange(preferredPositions);
         }
 
         /* func */
@@ -29,24 +27,14 @@ namespace JigsawPuzzle
             JPColor.RGBADelta(effectColor, spriteColor).SqrMagnitude;
         protected override bool ValueMapIsBetter(float[,] valueMap, out float averageDeltaValue)
         {
-            float TotalMaxDelta = EffectiveArea.Length * MaxSqrMagnitude;
+            float TotalMaxDelta = EffectiveArea.Length * DefaultMaxSqrMagnitude;
             float value = 0f;
-            for (int indedx = 0; indedx < EffectiveArea.Length / 3; indedx++)
+            for (int indedx = 0; indedx < EffectiveArea.Length; indedx++)
             {
                 Point selectPoint = EffectiveArea[indedx];
                 value += valueMap[selectPoint.X, selectPoint.Y];
             }
-            if (value > TotalMaxDelta)
-            {
-                averageDeltaValue = MaxSqrMagnitude;
-                return false;
-            }
-            for (int indedx = EffectiveArea.Length / 3; indedx < EffectiveArea.Length; indedx++)
-            {
-                Point selectPoint = EffectiveArea[indedx];
-                value += valueMap[selectPoint.X, selectPoint.Y];
-            }
-            averageDeltaValue = value / valueMap.Length;
+            averageDeltaValue = value / EffectiveArea.Length;
             return value < TotalMaxDelta;
         }
     }

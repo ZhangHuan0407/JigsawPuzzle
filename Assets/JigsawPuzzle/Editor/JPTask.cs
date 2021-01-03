@@ -16,7 +16,7 @@ namespace JigsawPuzzle
 
         internal SpriteInfo EffectSpriteInfo;
         internal JigsawPuzzleInfoData JPInfoData;
-        internal SpriteColorContainer SpriteColor;
+        internal SpriteColorContainer SpriteColorContainer;
         internal List<SpriteInfo> SpritesInfo;
         internal Stopwatch TaskStopwatch;
         internal StringBuilder Builder;
@@ -44,10 +44,7 @@ namespace JigsawPuzzle
             try
             {
                 InitParameter();
-                // 修改为直接在函数内报错
-                if (!TryReloadDataAncCheck())
-                    throw new ArgumentException($"Throw Exception where invoke {nameof(JPTask)}.{nameof(TryReloadDataAncCheck)}");
-
+                TryReloadDataAncCheck();
                 Pretreatment();
                 SpeculatePreferredPosition();
                 PredictLayout();
@@ -62,7 +59,7 @@ namespace JigsawPuzzle
             }
             finally
             {
-                SpriteColor?.Clear();
+                SpriteColorContainer?.Clear();
                 if (Builder != null)
                     File.WriteAllText($"{InfoDataFile.FullName}.log", Builder.ToString());
             }
@@ -75,20 +72,20 @@ namespace JigsawPuzzle
             byte[] binData = File.ReadAllBytes(BinDataFile.FullName);
 
             if (binData.Length != JPInfoData.BinDataLength)
-                return false;
+                throw new Exception($"binData.Length != JPInfoData.BinDataLength, {binData.Length}{JPInfoData.BinDataLength}");
 
-            SpriteColor = new SpriteColorContainer();
+            SpriteColorContainer = new SpriteColorContainer();
             EffectSpriteInfo = null;
             SpritesInfo = new List<SpriteInfo>();
             foreach (SpriteInfo spriteInfo in JPInfoData.SpriteInfos)
             {
-                SpriteColor.Add(spriteInfo, binData);
+                SpriteColorContainer.Add(spriteInfo, binData);
                 if (spriteInfo.IsEffect)
                 {
                     if (EffectSpriteInfo is null)
                         EffectSpriteInfo = spriteInfo;
                     else
-                        return false;
+                        throw new Exception("Effect 2.");
                 }
                 else
                     SpritesInfo.Add(spriteInfo);
@@ -114,11 +111,11 @@ namespace JigsawPuzzle
                 spriteInfo.PretreatmentPropensity = ShiftPositionPropensity.Interval2;
                 spriteInfo.Propensity = ShiftPositionPropensity.LineByLine;
                 spriteInfo.AccurateDistance = 1;
-                spriteInfo.PreferredPosHeap = new MinValuePointHeap(20, JPHColorMatch.DefaultMaxDelta);
+                spriteInfo.PreferredPosHeap = new MinValuePointHeap(20, JPRGBAColorMatch.DefaultMaxSqrMagnitude);
                 spriteInfo.MaxSqrMagnitude = JPRGBAColorMatch.DefaultMaxSqrMagnitude;
             }
 
-            JPColor[,] effectSpriteColor = SpriteColor[EffectSpriteInfo];
+            JPColor[,] effectSpriteColor = SpriteColorContainer[EffectSpriteInfo];
 #if PARALLELMODE
             ParallelLoopResult result = Parallel.ForEach(SpritesInfo, (SpriteInfo spriteInfo) =>
             {
@@ -129,11 +126,11 @@ namespace JigsawPuzzle
                 if (spriteInfo.PretreatmentPropensity == ShiftPositionPropensity.None)
                     return;
 
-                JPHColorMatch match = new JPHColorMatch(
+                JPRGBAColorMatch match = new JPRGBAColorMatch(
                     effectSpriteColor,
-                    SpriteColor[spriteInfo],
+                    SpriteColorContainer[spriteInfo],
                     spriteInfo.PretreatmentPropensity);
-#if DEBUG && MVC && !PARALLELMODE
+#if DEBUG && MVC
                 match.Log = Log;
 #endif
                 match.TryGetPreferredPosition();
@@ -141,8 +138,8 @@ namespace JigsawPuzzle
                     spriteInfo.PreferredPosHeap.AddMinItem(weightedPoint);
 #if DEBUG && MVC && !PARALLELMODE
                 StringBuilder builder = new StringBuilder();
-                foreach ((Point, float) point in spriteInfo.PreferredPosHeap.ToArray())
-                    builder.AppendLine($"{point.Item1}, {point.Item2}");
+                foreach (WeightedPoint weightedPoint in spriteInfo.PreferredPosHeap.ToArray())
+                    builder.AppendLine($"{nameof(WeightedPoint)} : {weightedPoint}");
                 Log.WriteData(null, "Pretreatment spriteInfo.PreferredPosHeap : ", builder.ToString());
 #endif
 #if PARALLELMODE
@@ -154,30 +151,44 @@ namespace JigsawPuzzle
         }
         private void SpeculatePreferredPosition()
         {
-            JPColor[,] effectSpriteColor = SpriteColor[EffectSpriteInfo];
+            JPColor[,] effectSpriteColor = SpriteColorContainer[EffectSpriteInfo];
+#if PARALLELMODE
             ParallelLoopResult result = Parallel.ForEach(SpritesInfo, (SpriteInfo spriteInfo) =>
             {
+#else
+            foreach (SpriteInfo spriteInfo in SpritesInfo)
+            {
+#endif
                 if (spriteInfo.Propensity == ShiftPositionPropensity.None)
                     return;
 
                 WeightedPoint[] preferredPositions = spriteInfo.PreferredPosHeap.ToArray();
-                spriteInfo.PreferredPosHeap = new MinValuePointHeap(10, JPRGBAColorMatch.DefaultMaxSqrMagnitude);
-                foreach (WeightedPoint weightPoint in preferredPositions)
-                {
-                    JPRGBAColorMatch accurateMatch = new JPRGBAColorMatch(
+                spriteInfo.PreferredPosHeap = new MinValuePointHeap(10, 1f);
+
+                JPRGBAColorMatch accurateMatch = new JPRGBAColorMatch(
                     effectSpriteColor,
-                    SpriteColor[spriteInfo],
+                    SpriteColorContainer[spriteInfo],
                     ShiftPositionPropensity.None,
-                    weightPoint.Value);
-#if DEBUG && MVC && !PARALLELMODE
-                    accurateMatch.Log = Log;
+                    preferredPositions);
+#if DEBUG && MVC
+                accurateMatch.Log = Log;
 #endif
-                    accurateMatch.TryGetNearlyPreferredPosition(weightPoint.Position, spriteInfo.AccurateDistance);
-                    if (accurateMatch.BestOne() is WeightedPoint bestPosition)
-                        spriteInfo.PreferredPosHeap.AddMinItem(bestPosition);
-                }
+                accurateMatch.TryGetNearlyPreferredPosition(spriteInfo.AccurateDistance);
+                // 对临近点进行聚类并排序入堆
+                List<WeightedPoint> weightedPoints = WeightedPoint.GroupWeightedPoints(accurateMatch.PreferredPosition, spriteInfo.Width / 4, spriteInfo.Height / 4);
+
+#if DEBUG && MVC
+                Log.WriteData(null, $"accurateMatch.PreferredPosition : {accurateMatch.PreferredPosition.Count}, weightedPoints : {weightedPoints.Count}\n" +
+                    $"PreferredPosition : {JsonFuck.FromObjectToJson(accurateMatch.PreferredPosition)}");
+#endif
+                foreach (WeightedPoint weightedPoint in weightedPoints)
+                    spriteInfo.PreferredPosHeap.AddMinItem(weightedPoint);
                 spriteInfo.PreferredPositions = spriteInfo.PreferredPosHeap.ToArray();
+#if PARALLELMODE
             });
+#else
+            }
+#endif
             Builder.AppendLine($"Finish {nameof(SpeculatePreferredPosition)}, {nameof(TaskStopwatch)} : {TaskStopwatch.ElapsedMilliseconds} ms");
         }
         [Obsolete("当前此方法不具有实际功能")]
@@ -188,8 +199,8 @@ namespace JigsawPuzzle
         private void FreeTemp()
         {
             EffectSpriteInfo = null;
-            SpriteColor.Clear();
-            SpriteColor = null;
+            SpriteColorContainer.Clear();
+            SpriteColorContainer = null;
             SpritesInfo.Clear();
             SpritesInfo = null;
             GC.Collect();

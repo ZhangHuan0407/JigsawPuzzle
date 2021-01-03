@@ -36,10 +36,10 @@ namespace JigsawPuzzle
         /// <summary>
         /// 64次随机枚举偏移量
         /// </summary>
-        Random64 = 0x0800,
+        Random256 = 0x0800,
         /// <summary>
-        /// 64次随机枚举偏移量
+        /// 512次随机枚举偏移量
         /// </summary>
-        Random256 = 0x0F00,
+        Random512 = 0x0F00,
     }
 }

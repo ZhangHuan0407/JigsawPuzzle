@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace JigsawPuzzle
 {
@@ -18,7 +17,7 @@ namespace JigsawPuzzle
         public ShiftPositionPropensity Propensity { get; protected set; }
         public JPColor[,] SpriteColor { get; protected set; }
         public Point[] EffectiveArea { get; protected set; }
-#if DEBUG && MVC && !PARALLELMODE
+#if DEBUG && MVC
         public Analysis.Log Log;
 #endif
 
@@ -50,31 +49,25 @@ namespace JigsawPuzzle
             PreferredPosition.Clear();
             Point spritetSize = SpriteColorSize;
             Value[,] valueMap = new Value[spritetSize.X, spritetSize.Y];
-
             EffectiveArea = GetEffectiveArea();
+
             foreach (Point point in GetShiftPosition())
             {
                 for (int index = 0; index < EffectiveArea.Length; index++)
                 {
                     Point selectPoint = EffectiveArea[index];
                     JPColor spriteColor = SpriteColor[selectPoint.X, selectPoint.Y];
-                    if (spriteColor.A == 0f)
-                        valueMap[selectPoint.X, selectPoint.Y] = new Value();
-                    else
-                    {
-                        JPColor effectColor = EffectSpriteColor[point.X + selectPoint.X, point.Y + selectPoint.Y];
-                        valueMap[selectPoint.X, selectPoint.Y] = GetDeltaValue(effectColor, spriteColor);
-                    }
+                    JPColor effectColor = EffectSpriteColor[point.X + selectPoint.X, point.Y + selectPoint.Y];
+                    valueMap[selectPoint.X, selectPoint.Y] = GetDeltaValue(effectColor, spriteColor);
                 }
-
                 if (ValueMapIsBetter(valueMap, out float averageValue))
                     PreferredPosition.Add(new WeightedPoint(point, averageValue));
             }
 #if DEBUG && MVC && !PARALLELMODE
             System.Text.StringBuilder builder = new System.Text.StringBuilder();
-            foreach ((Point, AverageValue) point in PreferredPosition)
-                builder.AppendLine($"{point.Item1} {point.Item2}");
-            Log.WriteData(null, "ColorMatch.TryGetPreferredPosition, PreferredPosition : ", builder.ToString());
+            foreach (WeightedPoint weightedPoint in PreferredPosition)
+                builder.AppendLine($"{nameof(WeightedPoint)} : {weightedPoint}");
+            Log.WriteData(null, $"ColorMatch.TryGetPreferredPosition, PreferredPosition : {PreferredPosition.Count}", builder.ToString());
 #endif
         }
         protected virtual Point[] GetEffectiveArea()
@@ -83,16 +76,18 @@ namespace JigsawPuzzle
             IEnumerable<Point> enumPoints;
             int count = EffectSpriteColor.Length;
             if (count < ZipCount)
-                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.One, ShiftPositionPropensity.LineByLine).ToArray();
-            else if (count < ZipCount * 4)
-                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.One, ShiftPositionPropensity.Interval2).ToArray();
+                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.One, ShiftPositionPropensity.LineByLine);
+            else if (count < ZipCount * 3)
+                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.One, ShiftPositionPropensity.Random512);
+            else if (count < ZipCount * 6)
+                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.One, ShiftPositionPropensity.Interval2);
             else
-                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.One, ShiftPositionPropensity.Interval3).ToArray();
+                enumPoints = ShiftPosition.EnumIt(SpriteColorSize, Point.One, ShiftPositionPropensity.Interval3);
 
             foreach (Point enumPoint in enumPoints)
             {
                 JPColor enumPointColor = SpriteColor[enumPoint.X, enumPoint.Y];
-                if (enumPointColor.A > 0)
+                if (enumPointColor.A > 0.25)
                     result.Add(enumPoint);
             }
             return result.ToArray();
@@ -102,45 +97,30 @@ namespace JigsawPuzzle
         protected abstract Value GetDeltaValue(JPColor effectColor, JPColor spriteColor);
         protected abstract bool ValueMapIsBetter(Value[,] valueMap, out float averageDeltaValue);
 
-        public virtual void TryGetNearlyPreferredPosition(Point position, int distance)
+        public virtual void TryGetNearlyPreferredPosition(int distance)
         {
             Check();
-            PreferredPosition.Clear();
             Point spriteSize = SpriteColorSize;
-            IEnumerable<Point> points = ShiftPosition.EnumItNearly(EffectSpriteColorSize, spriteSize, position, distance);
+            HashSet<Point> points = new HashSet<Point>();
+            foreach (WeightedPoint weightedPoint in PreferredPosition)
+                foreach (Point point in ShiftPosition.EnumItNearly(EffectSpriteColorSize, spriteSize, weightedPoint.Position, distance))
+                    points.Add(point);
+            PreferredPosition.Clear();
             EffectiveArea = GetEffectiveArea();
+            Value[,] valueMap = new Value[spriteSize.X, spriteSize.Y];
 
             foreach (Point point in points)
             {
-                Value[,] valueMap = new Value[spriteSize.X, spriteSize.Y];
                 foreach (Point selectPoint in EffectiveArea)
                 {
                     JPColor effectColor = EffectSpriteColor[point.X + selectPoint.X, point.Y + selectPoint.Y];
                     JPColor spriteColor = SpriteColor[selectPoint.X, selectPoint.Y];
-                    GetDeltaValue(effectColor, spriteColor);
+                    valueMap[selectPoint.X, selectPoint.Y] = GetDeltaValue(effectColor, spriteColor);
                 }
 
                 if (ValueMapIsBetter(valueMap, out float averageValue))
                     PreferredPosition.Add(new WeightedPoint(point, averageValue));
             }
-        }
-
-        public virtual WeightedPoint BestOne()
-        {
-            if (PreferredPosition.Count == 0)
-                return null;
-            int index = 0;
-            float minValue = PreferredPosition[0].Value;
-            for (int i = 1; i < PreferredPosition.Count; i++)
-            {
-                WeightedPoint position = PreferredPosition[i];
-                if (position.Value < minValue)
-                {
-                    index = i;
-                    minValue = position.Value;
-                }
-            }
-            return PreferredPosition[index];
         }
 
         /* IEnumerable */

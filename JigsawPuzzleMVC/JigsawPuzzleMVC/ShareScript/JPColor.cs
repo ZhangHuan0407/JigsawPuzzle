@@ -11,17 +11,17 @@
         /// <summary>
         /// 每一个 <see cref="JPColor"/> 在二进制文件中的实际存储尺寸
         /// </summary>
-        public const int PreJPColorDataSize = 7;
+        public const int PreJPColorDataSize = 5;
         /// <summary>
         /// 每一个 <see cref="JPColor"/> 在内存分页中的实际存储尺寸
         /// </summary>
-        public const int MemoryDataPreJPColor = 28;
+        public const int MemoryDataPreJPColor = 20;
 
         /* field */
         /// <summary>
         /// 颜色浮点分量
         /// </summary>
-        public float R, G, B, A, H, S, V;
+        public float R, G, B, A, H;
 
         /* ctor */
         public JPColor(byte[] data, int startIndex)
@@ -31,8 +31,6 @@
             B = data[startIndex++] / 255f;
             A = data[startIndex++] / 255f;
             H = data[startIndex++] / 255f;
-            S = data[startIndex++] / 255f;
-            V = data[startIndex++] / 255f;
         }
 
         /* inter */
@@ -44,7 +42,7 @@
         /// <returns>RGBA 视觉下的颜色差值</returns>
         public static JPVector3 RGBADelta(JPColor one, JPColor another)
         {
-            float ratio = one.A * another.A;
+            float ratio = another.A;
             JPVector3 result;
             if (ratio > 0)
                 result = new JPVector3(
@@ -65,7 +63,7 @@
         /* operator */
         public override string ToString()
         {
-            return $"RGRA {R},{G},{B},{A} HSV {H},{S},{V}";
+            return $"RGRA {R},{G},{B},{A} H {H}";
         }
     }
 }
