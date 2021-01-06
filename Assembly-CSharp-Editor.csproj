@@ -88,6 +88,7 @@
     <Compile Include="Assets\JigsawPuzzle\Editor\SpriteColorBuilder.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\SpriteColorContainer.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\SpriteInfo.cs" />
+    <Compile Include="Assets\JigsawPuzzle\Editor\UnitTest\JPColor_UnitTest.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\UnitTest\JPTaskConnector_UnitTest.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\UnitTest\ShareScripts_UnitTest.cs" />
     <Compile Include="Assets\JigsawPuzzle\Editor\UnitTest\ShiftPosition_UnitTest.cs" />
