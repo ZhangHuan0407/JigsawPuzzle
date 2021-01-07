@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace JigsawPuzzle
     public class JigsawPuzzleAsset : ScriptableObject
     {
         /* const */
-        public const string AssetDirectory = "Assets/Editor Default Resources/JigsawPuzzle/TaskAndData";
+        public const string AssetDirectory = "Assets/Editor Default Resources/JigsawPuzzle/Task";
 
         /* field */
         [Tooltip("效果图")]
@@ -23,12 +24,29 @@ namespace JigsawPuzzle
         [Tooltip("Data")]
         public JigsawPuzzleInfoData InfoData;
 
+        [HideInInspector]
+        [NonSerialized]
+        public Dictionary<string, SpriteInfo> SpriteMap;
+
         /* inter */
         public string AssetFullName => $"{AssetDirectory}/{DataName}.asset";
         public string InfoDataName => $"Task/{DataName}.json";
         public string InfoDataFullName => $"{AssetDirectory}/{DataName}.json";
         public string BinDataName => $"Task/{DataName}.bytes";
         public string BinDataFullName => $"{AssetDirectory}/{DataName}.bytes";
+
+        public SpriteInfo this[string spriteName]
+        {
+            get 
+            {
+                if (!Check)
+                    return null;
+                if (SpriteMap is null)
+                    SpriteMap = InfoData.ToDictionary();
+                SpriteMap.TryGetValue(spriteName, out SpriteInfo result);
+                return result;
+            }
+        }
 
         /* ctor */
         public JigsawPuzzleAsset()
@@ -112,13 +130,40 @@ namespace JigsawPuzzle
                 (HttpResponseMessage message) => Debug.LogError($"Task/CreateNewData failed. File : {InfoDataName}\n{message.Content.ReadAsStringAsync().Result}"));
         }
 
-        public static IEnumerable<string> GetAssetList() => Directory.GetFiles(AssetDirectory, "*.asset");
+        public void AddIntoWindow()
+        {
+            JigsawPuzzleWindow window = EditorWindow.GetWindow<JigsawPuzzleWindow>(nameof(JigsawPuzzleWindow));
+            if (!window.JPAssetPool.ContainsKey(Effect))
+                window.JPAssetPool.Add(Effect, this);
+        }
+
+        public static IEnumerable<string> GetAssetList()
+        {
+            foreach (string fileFullPath in Directory.GetFiles(AssetDirectory, "*.asset"))
+            {
+                FileInfo fileInfo = new FileInfo(fileFullPath);
+                yield return fileInfo.Name;
+            }
+        }
+
         public static JigsawPuzzleAsset GetNew()
         {
             Directory.CreateDirectory(AssetDirectory);
             JigsawPuzzleAsset instance = CreateInstance<JigsawPuzzleAsset>();
             AssetDatabase.CreateAsset(instance, instance.AssetFullName);
             return instance;
+        }
+        public static void OverrideInfoData(string name, byte[] binData)
+        {
+            Directory.CreateDirectory(AssetDirectory);
+            if (binData is null)
+                return;
+            File.WriteAllBytes($"{AssetDirectory}/{name}.json", binData);
+            Debug.LogError($"{AssetDirectory}/{name}");
+            JigsawPuzzleAsset asset = AssetDatabase.LoadAssetAtPath<JigsawPuzzleAsset>($"{AssetDirectory}/{name}");
+            JigsawPuzzleInfoData infoData = JsonFuck.FromJsonToObject<JigsawPuzzleInfoData>(Encoding.UTF8.GetString(binData));
+            asset.InfoData = infoData;
+            EditorUtility.SetDirty(asset);
         }
     }
 }

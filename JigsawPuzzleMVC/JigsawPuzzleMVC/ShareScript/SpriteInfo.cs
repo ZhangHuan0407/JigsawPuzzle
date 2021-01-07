@@ -92,6 +92,22 @@ namespace JigsawPuzzle
         public int PixelCount => Width * Height;
         public long ColorDataEndPosition => ColorDataStartPosition + ColorDataLength;
 
+#if UNITY_EDITOR
+        public Vector2Int? BestOne
+        {
+            get
+            {
+                Vector2Int? bestPosition = null;
+                if (PreferredPositions.Length > 0)
+                {
+                    WeightedPoint weightedPoint = PreferredPositions[PreferredPositions.Length - 1];
+                    bestPosition = new Vector2Int(weightedPoint.Position.X, weightedPoint.Position.Y);
+                }
+                return bestPosition;
+            }
+        }
+#endif
+
         /* ctor */
 #if UNITY_EDITOR
         public SpriteInfo(Sprite sprite, bool isEffect)

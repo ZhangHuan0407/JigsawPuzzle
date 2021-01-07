@@ -95,6 +95,7 @@ namespace JigsawPuzzle
                         resultObject = converter(responseMessage.Result.Content);
                         goto SuccessCallback;
                     }
+                    //Debug.Log(responseMessage.Result.Content);
 
                     Type returnType = controllerAction.GetSerializedReturnType();
                     if (returnType == null)

@@ -10,6 +10,7 @@ namespace JigsawPuzzle
         private JigsawPuzzleAsset m_Target => target as JigsawPuzzleAsset;
 
         /* func */
+
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
@@ -31,6 +32,9 @@ namespace JigsawPuzzle
                 m_Target.RemoveDataFiles();
                 AssetDatabase.Refresh();
             }
+            EditorGUILayout.Space();
+            if (GUILayout.Button(nameof(JigsawPuzzleAsset.AddIntoWindow)))
+                m_Target.AddIntoWindow();
         }
     }
 }

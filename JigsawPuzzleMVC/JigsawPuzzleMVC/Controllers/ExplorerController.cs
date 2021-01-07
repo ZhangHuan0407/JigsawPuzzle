@@ -114,7 +114,7 @@ namespace JigsawPuzzle.Controllers
             });
         }
         [WebAPI]
-        [HttpPost]
+        [HttpGet]
         public Task<ActionResult> DownloadFile()
         {
             return Task.Run(() => 

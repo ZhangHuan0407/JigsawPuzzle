@@ -9,10 +9,15 @@ namespace JigsawPuzzle
     {
         /* field */
         /// <summary>
-        /// Task 文件夹下
+        /// 远程服务器 Task 文件夹下
         /// </summary>
         public string[] Task;
 
+        /// <summary>
+        /// 本地 Task 文件夹下
+        /// </summary>
+        [NonSerialized]
+        public string[] Client;
 
         /* operator */
         public override string ToString()

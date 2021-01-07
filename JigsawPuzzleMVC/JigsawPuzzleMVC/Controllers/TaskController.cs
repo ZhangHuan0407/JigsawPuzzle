@@ -39,7 +39,7 @@ namespace JigsawPuzzle.Controllers
                 task.Log = Session[nameof(Log)] as Log;
 #endif
                 task.Start();
-                return new HttpStatusCodeResult(200, "Start New Task successful") as ActionResult;
+                return Content("Start New Task successful") as ActionResult;
             });
         }
     }

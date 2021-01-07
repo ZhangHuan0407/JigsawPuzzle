@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 #if UNITY_EDITOR
 using UnityEngine;
@@ -60,6 +61,14 @@ namespace JigsawPuzzle
             foreach (SpriteInfo spriteInfo in SpriteInfos)
                 length += spriteInfo.ColorDataLength;
             return length;
+        }
+
+        public Dictionary<string, SpriteInfo> ToDictionary()
+        {
+            Dictionary<string, SpriteInfo> dictionary = new Dictionary<string, SpriteInfo>();
+            foreach (SpriteInfo spriteInfo in SpriteInfos)
+                dictionary.Add(spriteInfo.SpriteFullPath, spriteInfo);
+            return dictionary;
         }
     }
 }

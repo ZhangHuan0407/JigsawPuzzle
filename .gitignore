@@ -58,7 +58,7 @@ crashlytics-build.properties
 
 # Resource
 /[Aa]ssets/Resources
-/[Aa]ssets/Editor Default Resources/JigsawPuzzle/TaskAndData
+/[Aa]ssets/Editor Default Resources/JigsawPuzzle/Task
 
 # Publish
 /Publish/MVCDebug
