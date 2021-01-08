@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 
 #if UNITY_EDITOR
@@ -73,7 +72,7 @@ namespace JigsawPuzzle
         /// <param name="success">服务器回复数据，检查通过</param>
         /// <param name="failed">链接中出现错误，或服务器返回执行不通过的状态码</param>
         /// <returns>执行任务</returns>
-        public Task Get(string action, string controller,
+        public Task<JPTaskConnector> Get(string action, string controller,
             Action<object> success,
             Action<HttpResponseMessage> failed = null)
         {
@@ -111,12 +110,14 @@ namespace JigsawPuzzle
                     {
                         needCallback = false;
                         success?.Invoke(resultObject);
+                        return this;
                     }
                 FailCallback:
                     if (needCallback)
                     {
                         needCallback = false;
                         failed?.Invoke(responseMessage.Result);
+                        return null;
                     }
                 }
                 catch (Exception e)
@@ -136,6 +137,7 @@ namespace JigsawPuzzle
                         failed?.Invoke(responseMessage?.Result);
                     }
                 }
+                return null;
             });
         }
         /// <summary>
@@ -148,7 +150,7 @@ namespace JigsawPuzzle
         /// <param name="success">服务器回复数据，检查通过</param>
         /// <param name="failed">链接中出现错误，或服务器返回执行不通过的状态码</param>
         /// <returns>执行任务</returns>
-        public void PostForm(string action, string controller,
+        public Task<JPTaskConnector> PostForm(string action, string controller,
             Dictionary<string, object> data,
             Action<object> success = null,
             Action<HttpResponseMessage> failed = null)
@@ -157,7 +159,7 @@ namespace JigsawPuzzle
             if (data is null)
                 throw new ArgumentNullException(nameof(data));
 
-            Task.Run(() =>
+            return Task.Run(() =>
             {
                 bool needCallback = false;
                 Task<HttpResponseMessage> responseMessage = null;
@@ -216,12 +218,14 @@ namespace JigsawPuzzle
                     {
                         needCallback = false;
                         success?.Invoke(resultObject);
+                        return this;
                     }
                 FailCallback:
                     if (needCallback)
                     {
                         needCallback = false;
                         failed?.Invoke(responseMessage.Result);
+                        return null;
                     }
                 }
                 catch (Exception e)
@@ -241,9 +245,10 @@ namespace JigsawPuzzle
                         failed?.Invoke(responseMessage?.Result);
                     }
                 }
+                return null;
             });
         }
-        public void PostFile(string controller, string action,
+        public Task<JPTaskConnector> PostFile(string controller, string action,
             byte[] binData, string name, string fileName,
             Action<object> success = null,
             Action<HttpResponseMessage> failed = null)
@@ -254,7 +259,7 @@ namespace JigsawPuzzle
             if (string.IsNullOrWhiteSpace(fileName))
                 throw new ArgumentException($"{nameof(fileName)}Can not be Null or white space", nameof(fileName));
 
-            Task.Run(() =>
+            return Task.Run(() =>
             {
                 bool needCallback = false;
                 Task<HttpResponseMessage> responseMessage = null;
@@ -291,12 +296,14 @@ namespace JigsawPuzzle
                     {
                         needCallback = false;
                         success?.Invoke(resultObject);
+                        return this;
                     }
                 FailCallback:
                     if (needCallback)
                     {
                         needCallback = false;
                         failed?.Invoke(responseMessage.Result);
+                        return null;
                     }
                 }
                 catch (Exception e)
@@ -316,6 +323,7 @@ namespace JigsawPuzzle
                         failed?.Invoke(responseMessage?.Result);
                     }
                 }
+                return null;
             });
         }
 
@@ -326,6 +334,5 @@ namespace JigsawPuzzle
                 yield return controllerAction;
         }
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
     }
 }

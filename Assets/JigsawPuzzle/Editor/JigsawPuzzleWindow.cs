@@ -123,7 +123,7 @@ namespace JigsawPuzzle
         private void GetTaskMap()
         {
             Connector.Value.Get("GetFileMapJson", "Explorer",
-                (object obj) => 
+                (object obj) =>
                 {
                     FileMap = obj as JPFileMap;
                     string[] serverTask = FileMap.Task;
@@ -143,21 +143,18 @@ namespace JigsawPuzzle
         private void DownloadInfoData(string task)
         {
             Connector.Value.PostForm("SelectFiles", "Explorer",
-                new Dictionary<string, object>() { { "File", new string[] { $"Task/{task}" } }, },
-                (_) =>
+                new Dictionary<string, object>() { { "File", new string[] { $"Task/{task}" } }, })
+            ?.Result.Get("DownloadFile", "Explorer",
+                (object contents) =>
                 {
-                    Connector.Value.Get("DownloadFile", "Explorer",
-                        (object contents) =>
-                        {
-                            lock (LockFactor)
-                            {
-                                Callback = () => JigsawPuzzleAsset.OverrideInfoData(task, contents as byte[]);
-                            }
-                        },
-                        (HttpResponseMessage message) => 
-                        {
-                            Debug.LogError(message.Content.ReadAsStringAsync().Result);
-                        });
+                    lock (LockFactor)
+                    {
+                        Callback = () => JigsawPuzzleAsset.OverrideInfoData(task, contents as byte[]);
+                    }
+                },
+                (HttpResponseMessage message) =>
+                {
+                    Debug.LogError(message.Content.ReadAsStringAsync().Result);
                 });
         }
         private void SetSelectedAsEffectImage()
