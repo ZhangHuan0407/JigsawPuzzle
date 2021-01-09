@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace JigsawPuzzle
@@ -17,7 +18,17 @@ namespace JigsawPuzzle
         /// 本地 Task 文件夹下
         /// </summary>
         [NonSerialized]
-        public string[] Client;
+        public string[] ClientTask;
+
+        /* func */
+        public static string GetFileName(string fileName)
+        {
+            int index = fileName.IndexOf('.');
+            if (index == -1)
+                return fileName;
+            else
+                return fileName.Substring(0, index);
+        }
 
         /* operator */
         public override string ToString()

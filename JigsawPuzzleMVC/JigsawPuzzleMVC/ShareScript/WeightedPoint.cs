@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace JigsawPuzzle
 {
     [ShareScript]
+    [Serializable]
     public class WeightedPoint
     {
         /* field */

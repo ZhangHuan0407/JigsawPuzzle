@@ -13,7 +13,7 @@ namespace JigsawPuzzle
         /* field */
         internal Lazy<JPTaskConnector> Connector = new Lazy<JPTaskConnector>(() => CreateJPTaskConnector());
         internal JPFileMap FileMap;
-        internal bool AutoHotkey;
+        internal bool Hotkey;
         internal KeyCode NextKeyCode;
         private Queue<Action> Coroutine;
 
@@ -44,10 +44,15 @@ namespace JigsawPuzzle
         }
         private void OnEnable()
         {
-            AutoHotkey = false;
+            Hotkey = false;
             Coroutine = new Queue<Action>();
             EffectImage = null;
             JPAssetPool = new Dictionary<Sprite, JigsawPuzzleAsset>();
+        }
+        private void OnDisable()
+        {
+            if (Hotkey)
+                SceneView.duringSceneGui -= SceneView_TryUseHotkey;
         }
 
         /* func */
@@ -60,33 +65,42 @@ namespace JigsawPuzzle
 
         private void OnGUI()
         {
+            GUILayout.BeginHorizontal();
             if (GUILayout.Button("GetNew"))
                 Coroutine.Enqueue(() => JigsawPuzzleAsset.GetNew());
-            if (GUILayout.Button(nameof(GetTaskMap))
-                && Coroutine.Count == 0)
-                Coroutine.Enqueue(GetTaskMap);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
 
+            GUILayout.Space(15f);
             GUILayout.BeginHorizontal();
             GUILayout.Label($"{nameof(EffectImage)} : {(EffectImage ? EffectImage.name : "null")}");
             if (GUILayout.Button(nameof(SetSelectedAsEffectImage)))
                 Coroutine.Enqueue(SetSelectedAsEffectImage);
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(15f);
-            if (GUILayout.Button($"{nameof(AutoHotkey)} {(AutoHotkey ? "Unregister" : "Register")}"))
-            {
-                if (AutoHotkey)
-                    SceneView.duringSceneGui -= SceneView_TryUseHotkey;
-                else
-                    SceneView.duringSceneGui += SceneView_TryUseHotkey;
-                AutoHotkey = !AutoHotkey;
-            }
-            GUILayout.BeginHorizontal();
-            GUILayout.Label(nameof(NextKeyCode));
-            NextKeyCode = (KeyCode)EditorGUILayout.EnumPopup(NextKeyCode);
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(nameof(NextKeyCode));
+            NextKeyCode = (KeyCode)EditorGUILayout.EnumPopup(NextKeyCode);
+            GUILayout.Space(15f);
+            if (GUILayout.Button($"{nameof(Hotkey)} {(Hotkey ? "Unregister" : "Register")}"))
+            {
+                if (Hotkey)
+                    SceneView.duringSceneGui -= SceneView_TryUseHotkey;
+                else
+                    SceneView.duringSceneGui += SceneView_TryUseHotkey;
+                Hotkey = !Hotkey;
+            }
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(15f);
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button(nameof(GetTaskMap))
+                && Coroutine.Count == 0)
+                Coroutine.Enqueue(GetTaskMap);
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
             if (FileMap != null)
             {
                 GUILayout.Label($"{nameof(FileMap)} Length : {FileMap.Task.Length}");
@@ -94,7 +108,7 @@ namespace JigsawPuzzle
                 {
                     string serverTask = FileMap.Task[index];
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label($"Client : {FileMap.Client?[index]}");
+                    GUILayout.Label($"Client : {FileMap.ClientTask?[index]}");
                     GUILayout.Label($"Server : {serverTask}");
                     if (GUILayout.Button(nameof(DownloadInfoData)))
                         Coroutine.Enqueue(() => DownloadInfoData(serverTask));
@@ -127,12 +141,13 @@ namespace JigsawPuzzle
                 {
                     FileMap = obj as JPFileMap;
                     string[] serverTask = FileMap.Task;
-                    FileMap.Client = new string[serverTask.Length];
-                    string[] clientTask = FileMap.Client;
+                    FileMap.ClientTask = new string[serverTask.Length];
+                    string[] clientTask = FileMap.ClientTask;
                     HashSet<string> clientAssetFile = new HashSet<string>(JigsawPuzzleAsset.GetAssetList());
                     for (int index = 0; index < serverTask.Length; index++)
                     {
-                        if (clientAssetFile.Contains(serverTask[index]))
+                        string fileName = JPFileMap.GetFileName(serverTask[index]);
+                        if (clientAssetFile.Contains(fileName))
                             clientTask[index] = "Exists";
                         else
                             clientTask[index] = "Not Found";
@@ -149,7 +164,7 @@ namespace JigsawPuzzle
                 {
                     lock (LockFactor)
                     {
-                        Callback = () => JigsawPuzzleAsset.OverrideInfoData(task, contents as byte[]);
+                        Callback = () => JigsawPuzzleAsset.OverrideInfoData(JPFileMap.GetFileName(task), contents as byte[]);
                     }
                 },
                 (HttpResponseMessage message) =>
@@ -193,7 +208,7 @@ namespace JigsawPuzzle
                 || currentEvent.keyCode == KeyCode.None)
                 return;
             if (currentEvent.keyCode == NextKeyCode)
-                Coroutine.Enqueue(() => SetImagePosition());
+                Coroutine.Enqueue(SetImagePosition);
         }
 
         internal void SetImagePosition()

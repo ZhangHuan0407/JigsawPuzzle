@@ -1,9 +1,12 @@
-﻿namespace JigsawPuzzle
+﻿using System;
+
+namespace JigsawPuzzle
 {
     /// <summary>
     /// 二维平面整型位置信息
     /// </summary>
     [ShareScript]
+    [Serializable]
     public struct Point
     {
         /* const */

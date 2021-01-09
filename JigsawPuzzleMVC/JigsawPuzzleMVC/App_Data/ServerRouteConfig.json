@@ -43,8 +43,8 @@
       "DebugOnly": false,
       "FormKeys": [],
       "FormValues": [],
-      "ReturnType": "",
-      "Type": "HttpPost"
+      "ReturnType": "System.Byte[]",
+      "Type": "HttpGet"
     },
     {
       "Action": "StartNew",

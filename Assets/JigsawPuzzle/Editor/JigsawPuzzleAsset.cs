@@ -142,7 +142,7 @@ namespace JigsawPuzzle
             foreach (string fileFullPath in Directory.GetFiles(AssetDirectory, "*.asset"))
             {
                 FileInfo fileInfo = new FileInfo(fileFullPath);
-                yield return fileInfo.Name;
+                yield return JPFileMap.GetFileName(fileInfo.Name);
             }
         }
 
@@ -159,8 +159,7 @@ namespace JigsawPuzzle
             if (binData is null)
                 return;
             File.WriteAllBytes($"{AssetDirectory}/{name}.json", binData);
-            Debug.LogError($"{AssetDirectory}/{name}");
-            JigsawPuzzleAsset asset = AssetDatabase.LoadAssetAtPath<JigsawPuzzleAsset>($"{AssetDirectory}/{name}");
+            JigsawPuzzleAsset asset = AssetDatabase.LoadAssetAtPath<JigsawPuzzleAsset>($"{AssetDirectory}/{name}.asset");
             JigsawPuzzleInfoData infoData = JsonFuck.FromJsonToObject<JigsawPuzzleInfoData>(Encoding.UTF8.GetString(binData));
             asset.InfoData = infoData;
             EditorUtility.SetDirty(asset);
