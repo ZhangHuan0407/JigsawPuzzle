@@ -13,7 +13,7 @@ namespace JigsawPuzzle
         /* field */
         internal Lazy<JPTaskConnector> Connector = new Lazy<JPTaskConnector>(() => CreateJPTaskConnector());
         internal JPFileMap FileMap;
-        internal bool Hotkey;
+        //internal bool Hotkey;
         internal KeyCode NextKeyCode;
         private Queue<Action> Coroutine;
 
@@ -37,22 +37,22 @@ namespace JigsawPuzzle
         }
 
         /* ctor */
-        [MenuItem("Custom Tool/Jigsaw Puzzle")]
+        [MenuItem("Custom Tool/Jigsaw Puzzle/Window")]
         public static void OpenJigsawPuzzleWindow()
         {
             JigsawPuzzleWindow window = GetWindow<JigsawPuzzleWindow>(nameof(JigsawPuzzleWindow));
         }
         private void OnEnable()
         {
-            Hotkey = false;
+            //Hotkey = false;
             Coroutine = new Queue<Action>();
             EffectImage = null;
             JPAssetPool = new Dictionary<Sprite, JigsawPuzzleAsset>();
         }
         private void OnDisable()
         {
-            if (Hotkey)
-                SceneView.duringSceneGui -= SceneView_TryUseHotkey;
+            //if (Hotkey)
+            //    SceneView.duringSceneGui -= SceneView_TryUseHotkey;
         }
 
         /* func */
@@ -83,14 +83,14 @@ namespace JigsawPuzzle
             GUILayout.Label(nameof(NextKeyCode));
             NextKeyCode = (KeyCode)EditorGUILayout.EnumPopup(NextKeyCode);
             GUILayout.Space(15f);
-            if (GUILayout.Button($"{nameof(Hotkey)} {(Hotkey ? "Unregister" : "Register")}"))
-            {
-                if (Hotkey)
-                    SceneView.duringSceneGui -= SceneView_TryUseHotkey;
-                else
-                    SceneView.duringSceneGui += SceneView_TryUseHotkey;
-                Hotkey = !Hotkey;
-            }
+            //if (GUILayout.Button($"{nameof(Hotkey)} {(Hotkey ? "Unregister" : "Register")}"))
+            //{
+            //    if (Hotkey)
+            //        SceneView.duringSceneGui -= SceneView_TryUseHotkey;
+            //    else
+            //        SceneView.duringSceneGui += SceneView_TryUseHotkey;
+            //    Hotkey = !Hotkey;
+            //}
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
 
@@ -200,25 +200,27 @@ namespace JigsawPuzzle
             }
         }
 
-        private void SceneView_TryUseHotkey(SceneView view)
-        {
-            Event currentEvent = Event.current;
-            if (currentEvent is null
-                || currentEvent.type != EventType.KeyUp
-                || currentEvent.keyCode == KeyCode.None)
-                return;
-            if (currentEvent.keyCode == NextKeyCode)
-                Coroutine.Enqueue(SetImagePosition);
-        }
+        //private void SceneView_TryUseHotkey(SceneView view)
+        //{
+        //Event currentEvent = Event.current;
+        //if (currentEvent is null
+        //    || currentEvent.type != EventType.KeyUp
+        //    || currentEvent.keyCode == KeyCode.None)
+        //    return;
+        //if (currentEvent.keyCode == NextKeyCode)
+        //    Coroutine.Enqueue(SetImagePosition);
+        //}
 
-        internal void SetImagePosition()
+        [MenuItem("Custom Tool/Jigsaw Puzzle/Set Image Position %J")]
+        public static void SetImagePosition()
         {
-            if (!EffectImage)
+            JigsawPuzzleWindow window = GetWindow<JigsawPuzzleWindow>();
+            if (!window.EffectImage)
             {
                 Debug.LogWarning($"Not found {nameof(EffectImage)}");
                 return;
             }
-            RectTransform sliderTrans = EffectSlider;
+            RectTransform sliderTrans = window.EffectSlider;
             if (!sliderTrans)
             {
                 Debug.LogWarning($"Not found {nameof(EffectSlider)}");
@@ -236,7 +238,7 @@ namespace JigsawPuzzle
                 return;
             }
 
-            if (!JPAssetPool.TryGetValue(EffectImage.sprite, out JigsawPuzzleAsset asset))
+            if (!window.JPAssetPool.TryGetValue(window.EffectImage.sprite, out JigsawPuzzleAsset asset))
             {
                 Debug.LogWarning($"Not found {nameof(JigsawPuzzleAsset)}");
                 return;
@@ -246,7 +248,10 @@ namespace JigsawPuzzle
             {
                 sliderTrans.anchoredPosition = bestPosition;
                 Selection.activeGameObject.transform.position = sliderTrans.position;
+                return;
             }
+            else
+                Debug.LogWarning($"Not found {imageSprite.texture.name}/{imageSprite.name}");
         }
     }
 }

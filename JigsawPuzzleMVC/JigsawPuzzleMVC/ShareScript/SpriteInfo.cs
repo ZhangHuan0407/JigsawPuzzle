@@ -93,6 +93,10 @@ namespace JigsawPuzzle
         public long ColorDataEndPosition => ColorDataStartPosition + ColorDataLength;
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// 尝试获取首选位置中的最佳点，
+        /// <para>效果图左下角作为起始点，图像中心作为终点</para>
+        /// </summary>
         public Vector2Int? BestOne
         {
             get
@@ -101,7 +105,9 @@ namespace JigsawPuzzle
                 if (PreferredPositions.Length > 0)
                 {
                     WeightedPoint weightedPoint = PreferredPositions[PreferredPositions.Length - 1];
-                    bestPosition = new Vector2Int(weightedPoint.Position.X, weightedPoint.Position.Y);
+                    int shiftX = weightedPoint.Position.X + Width / 2;
+                    int shiftY = weightedPoint.Position.Y + Height / 2;
+                    bestPosition = new Vector2Int(shiftX, shiftY);
                 }
                 return bestPosition;
             }

@@ -120,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analysis\Log.cs" />
+    <Compile Include="Analysis\Performance.cs" />
     <Compile Include="Analysis\WebAPIAttribute.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
