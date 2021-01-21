@@ -101,7 +101,7 @@ namespace JigsawPuzzle
                 Coroutine.Enqueue(GetTaskMap);
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
-            if (FileMap != null)
+            if (FileMap != null && FileMap.Task != null)
             {
                 GUILayout.Label($"{nameof(FileMap)} Length : {FileMap.Task.Length}");
                 for (int index = 0; index < FileMap.Task.Length; index++)
