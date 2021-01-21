@@ -35,7 +35,7 @@ namespace JigsawPuzzle
         {
             StringBuilder builder = new StringBuilder()
                 .AppendLine($"{nameof(Task)} Length : {Task?.Length}");
-            foreach (string fileName in Task)
+            foreach (string fileName in Task ?? new string[0])
                 builder.AppendLine($"    {nameof(fileName)} : {fileName}");
             return builder.ToString();
         }
