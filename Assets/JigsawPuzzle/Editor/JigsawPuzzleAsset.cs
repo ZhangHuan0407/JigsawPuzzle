@@ -132,9 +132,10 @@ namespace JigsawPuzzle
 
         public void AddIntoWindow()
         {
-            JigsawPuzzleWindow window = EditorWindow.GetWindow<JigsawPuzzleWindow>(nameof(JigsawPuzzleWindow));
-            if (!window.JPAssetPool.ContainsKey(Effect))
-                window.JPAssetPool.Add(Effect, this);
+            if (JigsawPuzzleWindow.JPAssetPool is null)
+                JigsawPuzzleWindow.JPAssetPool = new Dictionary<Sprite, JigsawPuzzleAsset>();
+            if (!JigsawPuzzleWindow.JPAssetPool.ContainsKey(Effect))
+                JigsawPuzzleWindow.JPAssetPool.Add(Effect, this);
         }
 
         public static IEnumerable<string> GetAssetList()

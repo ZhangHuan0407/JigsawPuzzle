@@ -10,7 +10,6 @@ namespace JigsawPuzzle
         private JigsawPuzzleAsset m_Target => target as JigsawPuzzleAsset;
 
         /* func */
-
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
