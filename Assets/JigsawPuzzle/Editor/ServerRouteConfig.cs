@@ -39,7 +39,11 @@ namespace JigsawPuzzle
             }
         }
 
+#if UNITY_EDITOR_WIN
         internal Uri BaseAddressUri => new Uri($"https://{BaseAddress}");
+#else
+        internal Uri BaseAddressUri => new Uri($"http://{BaseAddress}");
+#endif
 
         /* ctor */
         public ServerRouteConfig()
